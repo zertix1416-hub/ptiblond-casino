@@ -6,7 +6,7 @@ const {
 const fs = require("fs");
 
 // ================= CONFIG =================
-const TOKEN = process.env.DISCORD_TOKEN || "MTUzMjc3MDY4ODQ1MTIxOTU0Nw.GfRxDD.67k-XKD6WwfNhCmdYUKXdp3tnSSasJlg1qcacA";
+const TOKEN = process.env.DISCORD_TOKEN || "TOKEN_ICI";
 const OWNER_ID = "866234808328519730";
 
 // ================= CLIENT =================
