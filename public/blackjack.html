@@ -341,6 +341,21 @@ function savePl(){
     }).catch(function(){});
   }
 }
+
+// Relit la balance depuis MongoDB au démarrage si connecté
+(function(){
+  var token = localStorage.getItem('discord_session');
+  if(!token) return;
+  fetch('/auth/me?token='+token)
+    .then(function(r){return r.json();})
+    .then(function(user){
+      if(user.error) return;
+      balance = user.balance || 1000;
+      pl.balance = balance;
+      localStorage.setItem('casino_player', JSON.stringify(pl));
+      syncUI();
+    }).catch(function(){});
+})();
 function fmt(n){return Number(n).toLocaleString('fr-FR');}
 function syncUI(){
   document.getElementById('h-bal').textContent=fmt(balance);
