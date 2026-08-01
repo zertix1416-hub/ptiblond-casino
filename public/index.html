@@ -283,7 +283,7 @@ html, body {
   <div id="topbar">
     <div id="logo">&#9824; PTIBLOND CASINO</div>
     <div id="topbar-right">
-      <div id="balance-top">Balance : <span id="bal-val">1 000</span> &euro;</div>
+      <div id="balance-top">&#128176; <span id="bal-val">1 000</span> cr.</div>
       <input id="pseudo-input" type="text" placeholder="Votre pseudo..." maxlength="16"/>
       <button id="btn-enter" onclick="enterCasino()">ENTRER</button>
     </div>
@@ -483,9 +483,13 @@ function tickJackpot() {
 }
 tickJackpot();
 
-// Balance display — lit depuis localStorage
-var _pl = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
-var playerBal = _pl.balance || 1000;
+// Balance display — IDENTIQUE à blackjack/roulette
+var _plData = JSON.parse(localStorage.getItem('casino_player') || '{"name":"Joueur","balance":1000}');
+if (!_plData.balance || _plData.balance === 0) {
+  _plData.balance = 1000;
+  localStorage.setItem('casino_player', JSON.stringify(_plData));
+}
+var playerBal = _plData.balance;
 function updateBal() {
   document.getElementById('bal-val').textContent = playerBal.toLocaleString('fr-FR');
 }
@@ -493,11 +497,9 @@ updateBal();
 
 function enterCasino() {
   var p = document.getElementById('pseudo-input').value.trim();
-  if (p) {
-    var saved = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
-    saved.name = p;
-    localStorage.setItem('casino_player', JSON.stringify(saved));
-  }
+  var saved = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
+  if (p) saved.name = p;
+  localStorage.setItem('casino_player', JSON.stringify(saved));
   window.location.href = 'blackjack.html';
 }
 
