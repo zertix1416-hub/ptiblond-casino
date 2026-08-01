@@ -328,9 +328,12 @@ canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 
 <script>
 var pl=JSON.parse(localStorage.getItem('casino_player')||'{"name":"Joueur","balance":1000}');
-function savePl(){localStorage.setItem('casino_player',JSON.stringify(pl));}
+function savePl(){pl.balance=balance;localStorage.setItem('casino_player',JSON.stringify(pl));}
 function fmt(n){return Number(n).toLocaleString('fr-FR');}
-function syncUI(){document.getElementById('h-bal').textContent=fmt(pl.balance);document.getElementById('bal-v').textContent=fmt(pl.balance);}
+function syncUI(){
+  document.getElementById('h-bal').textContent=fmt(balance);
+  document.getElementById('bal-v').textContent=fmt(balance);
+}
 syncUI();
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2400);}
 var TCOLS=['#ef5350','#1e88e5','#fb8c00','#546e7a','#8e24aa'];
@@ -373,6 +376,15 @@ buildDeck();updateBetUI();showToast('Placez votre mise pour commencer');
   s.on('connect', function(){
     s.emit('identify', { name: pl.name, balance: pl.balance });
     console.log('Socket connecté');
+  });
+
+  // Quand l'admin modifie la balance → mettre à jour automatiquement
+  s.on('admin_balance_update', function(data){
+    // Mise à jour pour tous (sur Render tout le monde a le même localStorage côté web)
+    balance = data.newBalance;
+    pl.balance = data.newBalance;
+    savePl(); syncUI();
+    showToast('Admin: balance mise a jour -> ' + fmt(data.newBalance) + ' cr.');
   });
 
   // Quand le bot Discord passe online → afficher dans le titre

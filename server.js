@@ -17,14 +17,24 @@ global.io = io;
 //  HELPERS
 // ═══════════════════════════════════════
 function loadJSON(file) {
-    if (fs.existsSync(file)) {
-        try { return JSON.parse(fs.readFileSync(file, "utf8")); }
-        catch { return {}; }
+    // Sur Render, les fichiers dans /tmp persistent pendant la session
+    const renderPath = file.replace('./', '/tmp/');
+    const paths = [file, renderPath];
+    for (const p of paths) {
+        if (fs.existsSync(p)) {
+            try { return JSON.parse(fs.readFileSync(p, "utf8")); }
+            catch { continue; }
+        }
     }
     return {};
 }
 function saveJSON(file, data) {
-    fs.writeFileSync(file, JSON.stringify(data, null, 2));
+    // Sauvegarde dans les deux endroits
+    try { fs.writeFileSync(file, JSON.stringify(data, null, 2)); } catch {}
+    try {
+        const renderPath = file.replace('./', '/tmp/');
+        fs.writeFileSync(renderPath, JSON.stringify(data, null, 2));
+    } catch {}
 }
 
 // ═══════════════════════════════════════
@@ -133,13 +143,21 @@ app.get("/api/admin/users", adminAuth, (_req, res) => {
 app.post("/api/admin/balance", adminAuth, (req, res) => {
     const { userId, amount, action } = req.body;
     const eco = loadJSON("./economy.json");
-    if (!eco[userId]) return res.status(404).json({ error: "User introuvable" });
+    if (!eco[userId]) {
+        // Créer l'utilisateur s'il n'existe pas
+        eco[userId] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
+    }
     if (action === "set")    eco[userId].money = Math.max(0, Number(amount));
     if (action === "add")    eco[userId].money = Math.max(0, eco[userId].money + Number(amount));
     if (action === "remove") eco[userId].money = Math.max(0, eco[userId].money - Number(amount));
     saveJSON("./economy.json", eco);
-    if (global.io) global.io.emit("economy_update", eco);
-    res.json({ ok: true, newBalance: eco[userId].money });
+    const newBalance = eco[userId].money;
+    // Notifier tous les clients web connectés avec cet ID
+    if (global.io) {
+        global.io.emit("economy_update", eco);
+        global.io.emit("admin_balance_update", { userId, newBalance });
+    }
+    res.json({ ok: true, newBalance });
 });
 
 // Bannir / débannir
