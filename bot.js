@@ -427,7 +427,7 @@ client.on("messageCreate", async message => {
 
     // WEB LINK
     if (cmd === "!web") {
-        return message.reply({ embeds: [premiumEmbed("🌐 CASINO WEB", `Joue directement depuis le navigateur !\n\n🎮 **http://localhost:3000**\n\n🃏 Blackjack 3D\n🎡 Roulette en direct\n🎰 Machines à sous\n\n💡 Ta balance Discord est synchronisée avec le site !`)] });
+        return message.reply({ embeds: [premiumEmbed("🌐 CASINO WEB", `Joue directement depuis le navigateur !\n\n🎮 **https://ptiblond-casino.onrender.com/**\n\n🃏 Blackjack 3D\n🎡 Roulette en direct\n🎰 Machines à sous\n\n💡 Ta balance Discord est synchronisée avec le site !`)] });
     }
 });
 

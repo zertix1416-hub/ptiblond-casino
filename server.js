@@ -110,7 +110,7 @@ app.get("/api/live-feed", (_req, res) => {
 // ═══════════════════════════════════════
 //  ADMIN API  (protégé par mot de passe)
 // ═══════════════════════════════════════
-const ADMIN_PASSWORD = "ptiblond2024";
+const ADMIN_PASSWORD = "zizi";
 const bannedUsers = loadJSON("./banned.json") || {};
 
 function adminAuth(req, res, next) {

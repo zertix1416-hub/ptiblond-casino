@@ -1,15 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Admin Panel — PTIBLOND</title>
+<title>Admin Panel â€” PTIBLOND</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',sans-serif;color:#fff}
 
-/* ── LOGIN ── */
+/* â”€â”€ LOGIN â”€â”€ */
 #login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;
   justify-content:center;background:#060608}
 #login-box{background:linear-gradient(145deg,#0e0c1a,#080612);
@@ -33,7 +33,7 @@ html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',s
 #login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(220,50,50,.4)}
 #login-err{color:#e53935;font-size:.8rem;margin-top:10px;min-height:18px}
 
-/* ── LAYOUT ── */
+/* â”€â”€ LAYOUT â”€â”€ */
 #app{display:none;min-height:100vh}
 #sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;
   background:linear-gradient(180deg,rgba(10,8,18,.99),rgba(6,4,12,.99));
@@ -41,7 +41,7 @@ html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',s
   display:flex;flex-direction:column;padding:24px 0;z-index:50}
 #content{margin-left:240px;padding:0;min-height:100vh}
 
-/* ── SIDEBAR ── */
+/* â”€â”€ SIDEBAR â”€â”€ */
 .sidebar-logo{padding:0 20px 28px;border-bottom:1px solid rgba(220,50,50,.1);margin-bottom:16px}
 .sidebar-logo .icon{font-size:1.8rem;display:block;margin-bottom:4px;
   filter:drop-shadow(0 0 12px rgba(220,50,50,.5))}
@@ -62,7 +62,7 @@ html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',s
   font-family:'Oswald',sans-serif;font-size:.8rem;letter-spacing:1.5px;transition:.2s}
 .logout-btn:hover{background:rgba(220,50,50,.15)}
 
-/* ── TOP BAR ── */
+/* â”€â”€ TOP BAR â”€â”€ */
 #topbar{background:rgba(6,4,12,.98);border-bottom:1px solid rgba(255,255,255,.04);
   padding:16px 32px;display:flex;align-items:center;gap:16px;
   position:sticky;top:0;z-index:40}
@@ -79,7 +79,7 @@ html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',s
   font-size:.78rem;transition:.2s;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
 .refresh-btn:hover{background:rgba(255,255,255,.09);color:#ccc}
 
-/* ── PAGES ── */
+/* â”€â”€ PAGES â”€â”€ */
 .page{display:none;padding:28px 32px;animation:fadeIn .25s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -87,7 +87,7 @@ html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',s
   color:#ddd;margin-bottom:24px;display:flex;align-items:center;gap:12px}
 .page-title span{font-size:1.6rem}
 
-/* ── STAT CARDS ── */
+/* â”€â”€ STAT CARDS â”€â”€ */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px}
 .scard{background:linear-gradient(145deg,rgba(14,12,24,.95),rgba(8,6,16,.98));
   border-radius:14px;padding:20px 22px;position:relative;overflow:hidden;
@@ -102,7 +102,7 @@ html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',s
 .scard.gold .sv{color:#c8a032}.scard.blue .sv{color:#2979ff}
 .scard.purple .sv{color:#9c27b0}
 
-/* ── TABLE ── */
+/* â”€â”€ TABLE â”€â”€ */
 .table-wrap{background:linear-gradient(145deg,rgba(12,10,22,.98),rgba(8,6,16,.99));
   border-radius:16px;border:1px solid rgba(255,255,255,.05);overflow:hidden}
 .table-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);
@@ -134,7 +134,7 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
   border-radius:4px;padding:2px 8px;font-size:.62px;color:#00c850;
   font-family:'Oswald',sans-serif;letter-spacing:1px}
 
-/* ── ACTION BUTTONS ── */
+/* â”€â”€ ACTION BUTTONS â”€â”€ */
 .act-group{display:flex;gap:5px;flex-wrap:nowrap}
 .abtn{border:none;cursor:pointer;border-radius:6px;padding:5px 10px;
   font-size:.68rem;font-weight:600;transition:.15s;
@@ -148,7 +148,7 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
 .abtn.reset{background:rgba(41,121,255,.12);color:#2979ff;border:1px solid rgba(41,121,255,.2)}
 .abtn.nuke-row{background:rgba(255,100,0,.12);color:#ff6600;border:1px solid rgba(255,100,0,.2)}
 
-/* ── MODAL ── */
+/* â”€â”€ MODAL â”€â”€ */
 #modal-overlay{position:fixed;inset:0;z-index:150;display:none;
   align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(14px)}
 #modal-overlay.show{display:flex}
@@ -173,7 +173,7 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
 .mbtn.cancel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#777}
 .mbtn.cancel:hover{background:rgba(255,255,255,.1);color:#aaa}
 
-/* ── NUKE PAGE ── */
+/* â”€â”€ NUKE PAGE â”€â”€ */
 #nuke-zone{background:linear-gradient(145deg,rgba(20,5,5,.98),rgba(12,3,3,.99));
   border:1px solid rgba(220,50,50,.25);border-radius:16px;padding:40px;text-align:center;
   margin-top:20px;position:relative;overflow:hidden}
@@ -200,7 +200,7 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
 .nuke-btn:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(220,50,50,.5)}
 .nuke-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
 
-/* ── LIVE FEED ── */
+/* â”€â”€ LIVE FEED â”€â”€ */
 #feed-list{display:flex;flex-direction:column;gap:8px;max-height:500px;overflow-y:auto}
 #feed-list::-webkit-scrollbar{width:4px}
 #feed-list::-webkit-scrollbar-thumb{background:rgba(220,50,50,.3);border-radius:2px}
@@ -218,7 +218,7 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
 .feed-gain.pos{color:#00c850;font-weight:700}
 .feed-gain.neg{color:#e53935;font-weight:700}
 
-/* ── TOAST ── */
+/* â”€â”€ TOAST â”€â”€ */
 #admin-toast{position:fixed;top:20px;right:20px;z-index:200;
   background:rgba(0,200,80,.9);border-radius:10px;padding:12px 22px;
   font-size:.85rem;color:#000;font-weight:700;font-family:'Oswald',sans-serif;
@@ -232,11 +232,11 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
 <!-- LOGIN -->
 <div id="login-screen">
   <div id="login-box">
-    <span class="shield">🛡️</span>
+    <span class="shield">ðŸ›¡ï¸</span>
     <h1>ADMIN PANEL</h1>
-    <p>PTIBLOND CASINO — ACCÈS RESTREINT</p>
+    <p>PTIBLOND CASINO â€” ACCÃˆS RESTREINT</p>
     <input id="pwd-input" type="password" placeholder="Mot de passe..." onkeydown="if(event.key==='Enter')doLogin()">
-    <button id="login-btn" onclick="doLogin()">ACCÉDER</button>
+    <button id="login-btn" onclick="doLogin()">ACCÃ‰DER</button>
     <div id="login-err"></div>
   </div>
 </div>
@@ -246,26 +246,26 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
   <!-- SIDEBAR -->
   <div id="sidebar">
     <div class="sidebar-logo">
-      <span class="icon">🎰</span>
+      <span class="icon">ðŸŽ°</span>
       <h2>PTIBLOND</h2>
       <small>ADMIN PANEL</small>
     </div>
     <span class="nav-lbl">Navigation</span>
     <div class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
-      <span class="ico">📊</span> Dashboard
+      <span class="ico">ðŸ“Š</span> Dashboard
     </div>
     <div class="nav-btn" onclick="showPage('users')" id="nav-users">
-      <span class="ico">👥</span> Joueurs
+      <span class="ico">ðŸ‘¥</span> Joueurs
     </div>
     <div class="nav-btn" onclick="showPage('feed')" id="nav-feed">
-      <span class="ico">⚡</span> Flux Live
+      <span class="ico">âš¡</span> Flux Live
     </div>
     <span class="nav-lbl">Danger</span>
     <div class="nav-btn" onclick="showPage('nuke')" id="nav-nuke">
-      <span class="ico">💥</span> Zone NUKE
+      <span class="ico">ðŸ’¥</span> Zone NUKE
     </div>
     <div class="sidebar-bottom">
-      <button class="logout-btn" onclick="doLogout()">DÉCONNEXION</button>
+      <button class="logout-btn" onclick="doLogout()">DÃ‰CONNEXION</button>
     </div>
   </div>
 
@@ -277,20 +277,20 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
       <div class="sp"></div>
       <div class="status-badge" id="bot-status-badge">
         <div class="status-dot"></div>
-        <span id="bot-status-txt">Bot connecté</span>
+        <span id="bot-status-txt">Bot connectÃ©</span>
       </div>
-      <button class="refresh-btn" onclick="loadAll()">🔄 Actualiser</button>
+      <button class="refresh-btn" onclick="loadAll()">ðŸ”„ Actualiser</button>
     </div>
 
     <!-- DASHBOARD PAGE -->
     <div class="page active" id="page-dashboard">
       <div class="stats-grid" id="stats-grid">
-        <div class="scard gold"><div class="sl">Joueurs</div><div class="sv" id="s-players">—</div><div class="si">👥</div></div>
-        <div class="scard green"><div class="sl">Argent Total</div><div class="sv" id="s-money">—</div><div class="si">💰</div></div>
-        <div class="scard blue"><div class="sl">Parties</div><div class="sv" id="s-games">—</div><div class="si">🎮</div></div>
-        <div class="scard purple"><div class="sl">Jackpots</div><div class="sv" id="s-jackpots">—</div><div class="si">👑</div></div>
-        <div class="scard red"><div class="sl">Bannis</div><div class="sv" id="s-banned">—</div><div class="si">🚫</div></div>
-        <div class="scard gold"><div class="sl">Fortune Max</div><div class="sv" id="s-richest">—</div><div class="si">🏆</div></div>
+        <div class="scard gold"><div class="sl">Joueurs</div><div class="sv" id="s-players">â€”</div><div class="si">ðŸ‘¥</div></div>
+        <div class="scard green"><div class="sl">Argent Total</div><div class="sv" id="s-money">â€”</div><div class="si">ðŸ’°</div></div>
+        <div class="scard blue"><div class="sl">Parties</div><div class="sv" id="s-games">â€”</div><div class="si">ðŸŽ®</div></div>
+        <div class="scard purple"><div class="sl">Jackpots</div><div class="sv" id="s-jackpots">â€”</div><div class="si">ðŸ‘‘</div></div>
+        <div class="scard red"><div class="sl">Bannis</div><div class="sv" id="s-banned">â€”</div><div class="si">ðŸš«</div></div>
+        <div class="scard gold"><div class="sl">Fortune Max</div><div class="sv" id="s-richest">â€”</div><div class="si">ðŸ†</div></div>
       </div>
       <div class="table-wrap">
         <div class="table-header">
@@ -312,7 +312,7 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
           <input class="search-input" id="search-input" placeholder="Chercher un ID..." oninput="filterUsers()">
         </div>
         <table><thead><tr>
-          <th>ID Discord</th><th>Balance</th><th>Victoires</th><th>Défaites</th>
+          <th>ID Discord</th><th>Balance</th><th>Victoires</th><th>DÃ©faites</th>
           <th>Parties</th><th>W.Streak</th><th>Jackpots</th><th>Statut</th><th>Actions</th>
         </tr></thead>
         <tbody id="users-body"></tbody></table>
@@ -323,14 +323,14 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
     <div class="page" id="page-feed">
       <div class="table-wrap" style="border-radius:16px;overflow:hidden">
         <div class="table-header">
-          <h3>ACTIVITÉ EN DIRECT</h3>
+          <h3>ACTIVITÃ‰ EN DIRECT</h3>
           <div class="sp"></div>
           <span style="font-size:.72rem;color:#444">Discord + Web</span>
         </div>
         <div style="padding:16px">
           <div id="feed-list">
             <div style="text-align:center;color:#333;padding:40px;font-size:.85rem">
-              En attente d'activité...
+              En attente d'activitÃ©...
             </div>
           </div>
         </div>
@@ -341,19 +341,19 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
     <div class="page" id="page-nuke">
       <div style="max-width:680px;margin:0 auto">
         <div id="nuke-zone">
-          <span class="nuke-icon">☢️</span>
+          <span class="nuke-icon">â˜¢ï¸</span>
           <h2>ZONE NUKE</h2>
-          <p>Cette action va supprimer <strong style="color:#e53935">TOUTES</strong> les données —
+          <p>Cette action va supprimer <strong style="color:#e53935">TOUTES</strong> les donnÃ©es â€”
             balances, statistiques, historique, bans.<br>
-            Irréversible. Tout le monde repart de zéro.</p>
+            IrrÃ©versible. Tout le monde repart de zÃ©ro.</p>
 
           <div class="nuke-warning">
-            ⚠️ <strong>ATTENTION :</strong> Cette action :<br>
-            — Remet toutes les balances à 0<br>
-            — Supprime toutes les statistiques<br>
-            — Retire tous les bans<br>
-            — Notifie tous les clients connectés en temps réel<br>
-            — <strong>NE PEUT PAS ÊTRE ANNULÉE</strong>
+            âš ï¸ <strong>ATTENTION :</strong> Cette action :<br>
+            â€” Remet toutes les balances Ã  0<br>
+            â€” Supprime toutes les statistiques<br>
+            â€” Retire tous les bans<br>
+            â€” Notifie tous les clients connectÃ©s en temps rÃ©el<br>
+            â€” <strong>NE PEUT PAS ÃŠTRE ANNULÃ‰E</strong>
           </div>
 
           <input class="nuke-confirm-input" id="nuke-input"
@@ -361,7 +361,7 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
             oninput="document.getElementById('nuke-exec-btn').disabled=this.value!=='PTIBLOND_NUKE'">
           <br><br>
           <button class="nuke-btn" id="nuke-exec-btn" onclick="doNuke()" disabled>
-            💥 LANCER LE NUKE
+            ðŸ’¥ LANCER LE NUKE
           </button>
         </div>
       </div>
@@ -384,361 +384,183 @@ td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
 </div>
 
 <div id="admin-toast"></div>
-
-<!-- LOGIN -->
-<div id="login-screen">
-  <div id="login-box">
-    <span class="shield">🛡️</span>
-    <h1>ADMIN PANEL</h1>
-    <p>PTIBLOND CASINO — ACCÈS RESTREINT</p>
-    <input id="pwd-input" type="password" placeholder="Mot de passe..." onkeydown="if(event.key==='Enter')doLogin()">
-    <button id="login-btn" onclick="doLogin()">ACCÉDER</button>
-    <div id="login-err"></div>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-  <div id="sidebar">
-    <div class="sidebar-logo">
-      <span class="icon">🎰</span>
-      <h2>PTIBLOND</h2>
-      <small>ADMIN PANEL</small>
-    </div>
-    <span class="nav-lbl">Navigation</span>
-    <div class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
-      <span class="ico">📊</span> Dashboard
-    </div>
-    <div class="nav-btn" onclick="showPage('users')" id="nav-users">
-      <span class="ico">👥</span> Joueurs
-    </div>
-    <div class="nav-btn" onclick="showPage('feed')" id="nav-feed">
-      <span class="ico">⚡</span> Flux Live
-    </div>
-    <span class="nav-lbl">Danger</span>
-    <div class="nav-btn" onclick="showPage('nuke')" id="nav-nuke">
-      <span class="ico">💥</span> Zone NUKE
-    </div>
-    <div class="sidebar-bottom">
-      <button class="logout-btn" onclick="doLogout()">DÉCONNEXION</button>
-    </div>
-  </div>
-
-  <div id="content">
-    <div id="topbar">
-      <h1 id="page-title">DASHBOARD</h1>
-      <div class="sp"></div>
-      <div class="status-badge">
-        <div class="status-dot"></div>
-        <span id="bot-status-txt">Vérification...</span>
-      </div>
-      <button class="refresh-btn" onclick="loadAll()">🔄 Actualiser</button>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="stats-grid" id="stats-grid">
-        <div class="scard gold"><div class="sl">Joueurs</div><div class="sv" id="s-players">—</div><div class="si">👥</div></div>
-        <div class="scard green"><div class="sl">Argent Total</div><div class="sv" id="s-money">—</div><div class="si">💰</div></div>
-        <div class="scard blue"><div class="sl">Parties Jouées</div><div class="sv" id="s-games">—</div><div class="si">🎮</div></div>
-        <div class="scard purple"><div class="sl">Jackpots</div><div class="sv" id="s-jackpots">—</div><div class="si">👑</div></div>
-        <div class="scard red"><div class="sl">Bannis</div><div class="sv" id="s-banned">—</div><div class="si">🚫</div></div>
-        <div class="scard gold"><div class="sl">Fortune Max</div><div class="sv" id="s-richest">—</div><div class="si">🏆</div></div>
-      </div>
-      <div class="table-wrap">
-        <div class="table-header"><h3>TOP 10 JOUEURS</h3></div>
-        <table><thead><tr>
-          <th>Rang</th><th>ID Discord</th><th>Balance</th><th>V</th><th>D</th><th>Parties</th><th>Jackpots</th><th>Statut</th>
-        </tr></thead><tbody id="top10-body"></tbody></table>
-      </div>
-    </div>
-
-    <!-- USERS -->
-    <div class="page" id="page-users">
-      <div class="table-wrap">
-        <div class="table-header">
-          <h3>TOUS LES JOUEURS</h3>
-          <div class="sp"></div>
-          <input class="search-input" id="search-input" placeholder="Chercher un ID..." oninput="filterUsers()">
-        </div>
-        <table><thead><tr>
-          <th>ID Discord</th><th>Balance</th><th>V</th><th>D</th><th>Parties</th><th>Streak</th><th>JK</th><th>Statut</th><th>Actions</th>
-        </tr></thead><tbody id="users-body"></tbody></table>
-      </div>
-    </div>
-
-    <!-- FEED -->
-    <div class="page" id="page-feed">
-      <div class="table-wrap">
-        <div class="table-header">
-          <h3>ACTIVITÉ EN DIRECT</h3>
-          <div class="sp"></div>
-          <button class="refresh-btn" onclick="renderFeed()">Vider</button>
-        </div>
-        <div style="padding:16px">
-          <div id="feed-list"><div style="text-align:center;color:#2a2a2a;padding:40px">En attente d'activité...</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- NUKE -->
-    <div class="page" id="page-nuke">
-      <div style="max-width:680px;margin:0 auto">
-        <div id="nuke-zone">
-          <span class="nuke-icon">☢️</span>
-          <h2>ZONE NUKE</h2>
-          <p>Cette action va supprimer <strong style="color:#e53935">TOUTES</strong> les données :
-          balances, stats, historique, bans.<br>Irréversible. Tout le monde repart de zéro.</p>
-          <div class="nuke-warning">
-            ⚠️ <strong>CETTE ACTION :</strong><br>
-            — Remet toutes les balances à 0<br>
-            — Supprime toutes les statistiques<br>
-            — Retire tous les bans<br>
-            — Notifie tous les clients connectés en temps réel<br>
-            — <strong>NE PEUT PAS ÊTRE ANNULÉE</strong>
-          </div>
-          <input class="nuke-confirm-input" id="nuke-input"
-            placeholder="Tape PTIBLOND_NUKE pour confirmer"
-            oninput="document.getElementById('nuke-exec-btn').disabled=this.value!=='PTIBLOND_NUKE'">
-          <br><br>
-          <button class="nuke-btn" id="nuke-exec-btn" onclick="doNuke()" disabled>
-            💥 LANCER LE NUKE
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL -->
-<div id="modal-overlay">
-  <div id="modal">
-    <h2 id="modal-title">Action</h2>
-    <p id="modal-desc">Description</p>
-    <input id="modal-input" type="number" placeholder="Montant" min="0">
-    <div class="modal-btns">
-      <button class="mbtn cancel" onclick="closeModal()">Annuler</button>
-      <button class="mbtn confirm" id="modal-confirm-btn" onclick="confirmModal()">Confirmer</button>
-    </div>
-  </div>
-</div>
-<div id="admin-toast"></div>
-
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var ADMIN_PWD = '';
-var allUsers = [];
-var feedItems = [];
+var ADMIN_PWD='', allUsers=[], feedItems=[];
 
-// ── AUTH ──
 function doLogin(){
-  var pwd = document.getElementById('pwd-input').value;
-  fetch('/api/admin/stats', { headers: { 'x-admin-password': pwd } })
-    .then(function(r){ return r.json(); })
+  var pwd=document.getElementById('pwd-input').value;
+  if(!pwd){document.getElementById('login-err').textContent='Entrez le mot de passe';return;}
+  var btn=document.getElementById('login-btn');
+  btn.textContent='Connexion...';btn.disabled=true;
+  document.getElementById('login-err').textContent='';
+  fetch('/api/admin/stats',{headers:{'x-admin-password':pwd}})
+    .then(function(r){
+      if(!r.ok){throw new Error('HTTP '+r.status);}
+      return r.json();
+    })
     .then(function(d){
-      if(d.error){ document.getElementById('login-err').textContent = '❌ Mot de passe incorrect'; return; }
-      ADMIN_PWD = pwd;
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'flex';
-      loadAll();
-      startSocket();
-    }).catch(function(){ document.getElementById('login-err').textContent = '❌ Serveur indisponible'; });
+      btn.textContent='ACCEDER';btn.disabled=false;
+      if(d.error){
+        document.getElementById('login-err').textContent='Mot de passe incorrect';
+        return;
+      }
+      ADMIN_PWD=pwd;
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('app').style.display='flex';
+      loadAll(); startSocket();
+    })
+    .catch(function(e){
+      btn.textContent='ACCEDER';btn.disabled=false;
+      document.getElementById('login-err').textContent='Erreur serveur : '+e.message+'. Lance node server.js';
+    });
 }
-function doLogout(){ ADMIN_PWD=''; location.reload(); }
-function api(url, opts){ return fetch(url, Object.assign({ headers: { 'x-admin-password': ADMIN_PWD, 'Content-Type':'application/json' } }, opts)).then(function(r){ return r.json(); }); }
-
-// ── TOAST ──
-function toast(msg, err){
-  var t = document.getElementById('admin-toast');
-  t.textContent = msg; t.className = 'show' + (err?' error':'');
-  clearTimeout(t._t); t._t = setTimeout(function(){ t.className=''; }, 2800);
+function doLogout(){ADMIN_PWD='';location.reload();}
+function api(url,opts){
+  return fetch(url,Object.assign({headers:{'x-admin-password':ADMIN_PWD,'Content-Type':'application/json'}},opts))
+    .then(function(r){return r.json();});
 }
-
-// ── NAV ──
+function toast(msg,err){
+  var t=document.getElementById('admin-toast');
+  t.textContent=msg;t.className='show'+(err?' error':'');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2800);
+}
 function showPage(name){
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('page-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
-  var titles = { dashboard:'DASHBOARD', users:'JOUEURS', feed:'FLUX LIVE', nuke:'ZONE NUKE' };
-  document.getElementById('page-title').textContent = titles[name] || name.toUpperCase();
+  var titles={dashboard:'DASHBOARD',users:'JOUEURS',feed:'FLUX LIVE',nuke:'ZONE NUKE'};
+  document.getElementById('page-title').textContent=titles[name]||name.toUpperCase();
 }
-
-// ── LOAD ALL ──
-function loadAll(){
-  loadStats();
-  loadUsers();
-}
-
+function loadAll(){loadStats();loadUsers();}
 function loadStats(){
   api('/api/admin/stats').then(function(d){
-    if(d.error) return;
-    document.getElementById('s-players').textContent = d.totalPlayers;
-    document.getElementById('s-money').textContent = d.totalMoney.toLocaleString('fr-FR');
-    document.getElementById('s-games').textContent = d.totalGames;
-    document.getElementById('s-jackpots').textContent = d.totalJackpots;
-    document.getElementById('s-banned').textContent = d.bannedCount;
-    document.getElementById('s-richest').textContent = d.richest.toLocaleString('fr-FR');
+    if(d.error)return;
+    document.getElementById('s-players').textContent=d.totalPlayers;
+    document.getElementById('s-money').textContent=d.totalMoney.toLocaleString('fr-FR');
+    document.getElementById('s-games').textContent=d.totalGames;
+    document.getElementById('s-jackpots').textContent=d.totalJackpots;
+    document.getElementById('s-banned').textContent=d.bannedCount;
+    document.getElementById('s-richest').textContent=d.richest.toLocaleString('fr-FR');
   });
 }
-
 function loadUsers(){
   api('/api/admin/users').then(function(users){
-    if(!Array.isArray(users)) return;
-    allUsers = users;
-    renderTop10();
-    renderUsers(users);
+    if(!Array.isArray(users))return;
+    allUsers=users; renderTop10(); renderUsers(users);
   });
 }
-
 function renderTop10(){
-  var tbody = document.getElementById('top10-body');
-  var medals = ['🥇','🥈','🥉'];
-  tbody.innerHTML = allUsers.slice(0,10).map(function(u, i){
+  var medals=['🥇','🥈','🥉'];
+  document.getElementById('top10-body').innerHTML=allUsers.slice(0,10).map(function(u,i){
     return '<tr class="'+(u.banned?'banned-row':'')+'">'
-      + '<td>'+(medals[i]||('#'+(i+1)))+'</td>'
-      + '<td class="td-id">'+u.id+'</td>'
-      + '<td class="td-bal">'+u.money.toLocaleString('fr-FR')+' cr.</td>'
-      + '<td class="td-wins">'+u.wins+'</td>'
-      + '<td class="td-losses">'+u.losses+'</td>'
-      + '<td class="td-games">'+u.games+'</td>'
-      + '<td class="td-jk">'+u.jackpots+'</td>'
-      + '<td>'+(u.banned?'<span class="banned-tag">BANNI</span>':'<span class="online-tag">ACTIF</span>')+'</td>'
-      + '</tr>';
+      +'<td>'+(medals[i]||'#'+(i+1))+'</td>'
+      +'<td class="td-id">'+u.id+'</td>'
+      +'<td class="td-bal">'+u.money.toLocaleString('fr-FR')+' cr.</td>'
+      +'<td class="td-wins">'+u.wins+'</td><td class="td-losses">'+u.losses+'</td>'
+      +'<td class="td-games">'+u.games+'</td><td class="td-jk">'+u.jackpots+'</td>'
+      +'<td>'+(u.banned?'<span class="banned-tag">BANNI</span>':'<span class="online-tag">ACTIF</span>')+'</td>'
+      +'</tr>';
   }).join('');
 }
-
 function renderUsers(users){
-  var tbody = document.getElementById('users-body');
-  tbody.innerHTML = users.map(function(u){
+  document.getElementById('users-body').innerHTML=users.map(function(u){
     return '<tr class="'+(u.banned?'banned-row':'')+'">'
-      + '<td class="td-id">'+u.id+'</td>'
-      + '<td class="td-bal">'+u.money.toLocaleString('fr-FR')+'</td>'
-      + '<td class="td-wins">'+u.wins+'</td>'
-      + '<td class="td-losses">'+u.losses+'</td>'
-      + '<td class="td-games">'+u.games+'</td>'
-      + '<td class="td-ws">'+u.winstreak+'</td>'
-      + '<td class="td-jk">'+u.jackpots+'</td>'
-      + '<td>'+(u.banned?'<span class="banned-tag">BANNI</span>':'<span class="online-tag">ACTIF</span>')+'</td>'
-      + '<td><div class="act-group">'
-        + '<button class="abtn add" onclick="openModal(\'add\',\''+u.id+'\')">+cr</button>'
-        + '<button class="abtn remove" onclick="openModal(\'remove\',\''+u.id+'\')">-cr</button>'
-        + '<button class="abtn set" onclick="openModal(\'set\',\''+u.id+'\')">Set</button>'
-        + '<button class="abtn reset" onclick="resetUser(\''+u.id+'\')">Reset</button>'
-        + (u.banned
-          ? '<button class="abtn unban" onclick="banUser(\''+u.id+'\',\'unban\')">Débannir</button>'
-          : '<button class="abtn ban" onclick="banUser(\''+u.id+'\',\'ban\')">Bannir</button>')
-        + '</div></td>'
-      + '</tr>';
+      +'<td class="td-id">'+u.id+'</td>'
+      +'<td class="td-bal">'+u.money.toLocaleString('fr-FR')+'</td>'
+      +'<td class="td-wins">'+u.wins+'</td><td class="td-losses">'+u.losses+'</td>'
+      +'<td class="td-games">'+u.games+'</td><td class="td-ws">'+u.winstreak+'</td>'
+      +'<td class="td-jk">'+u.jackpots+'</td>'
+      +'<td>'+(u.banned?'<span class="banned-tag">BANNI</span>':'<span class="online-tag">ACTIF</span>')+'</td>'
+      +'<td><div class="act-group">'
+        +'<button class="abtn add" onclick="openModal(\'add\',\''+u.id+'\')">+cr</button>'
+        +'<button class="abtn remove" onclick="openModal(\'remove\',\''+u.id+'\')">-cr</button>'
+        +'<button class="abtn set" onclick="openModal(\'set\',\''+u.id+'\')">Set</button>'
+        +'<button class="abtn reset" onclick="resetUser(\''+u.id+'\')">Reset</button>'
+        +(u.banned
+          ?'<button class="abtn unban" onclick="banUser(\''+u.id+'\',\'unban\')">Débannir</button>'
+          :'<button class="abtn ban" onclick="banUser(\''+u.id+'\',\'ban\')">Bannir</button>')
+        +'</div></td>'
+      +'</tr>';
   }).join('');
 }
-
 function filterUsers(){
-  var q = document.getElementById('search-input').value.toLowerCase();
-  var filtered = allUsers.filter(function(u){ return u.id.toLowerCase().includes(q); });
-  renderUsers(filtered);
+  var q=document.getElementById('search-input').value.toLowerCase();
+  renderUsers(allUsers.filter(function(u){return u.id.toLowerCase().includes(q);}));
 }
-
-// ── MODAL ──
-var modalAction = '', modalUserId = '';
-function openModal(action, userId){
-  modalAction = action; modalUserId = userId;
-  var labels = { add:'Ajouter des crédits', remove:'Retirer des crédits', set:'Définir la balance' };
-  document.getElementById('modal-title').textContent = labels[action] || action;
-  document.getElementById('modal-desc').textContent = 'Joueur : ' + userId;
-  document.getElementById('modal-input').value = '';
+var modalAction='',modalUserId='';
+function openModal(action,userId){
+  modalAction=action;modalUserId=userId;
+  var labels={add:'Ajouter des crédits',remove:'Retirer des crédits',set:'Définir la balance'};
+  document.getElementById('modal-title').textContent=labels[action]||action;
+  document.getElementById('modal-desc').textContent='Joueur : '+userId;
+  document.getElementById('modal-input').value='';
   document.getElementById('modal-overlay').classList.add('show');
-  setTimeout(function(){ document.getElementById('modal-input').focus(); }, 100);
+  setTimeout(function(){document.getElementById('modal-input').focus();},100);
 }
-function closeModal(){ document.getElementById('modal-overlay').classList.remove('show'); }
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
 function confirmModal(){
-  var amount = parseInt(document.getElementById('modal-input').value, 10);
-  if(isNaN(amount) || amount < 0){ toast('Montant invalide', true); return; }
-  api('/api/admin/balance', { method:'POST', body: JSON.stringify({ userId: modalUserId, amount: amount, action: modalAction }) })
+  var amount=parseInt(document.getElementById('modal-input').value,10);
+  if(isNaN(amount)||amount<0){toast('Montant invalide',true);return;}
+  api('/api/admin/balance',{method:'POST',body:JSON.stringify({userId:modalUserId,amount:amount,action:modalAction})})
     .then(function(d){
-      if(d.error){ toast(d.error, true); return; }
-      toast('✅ Balance mise à jour : ' + d.newBalance.toLocaleString('fr-FR') + ' cr.');
-      closeModal(); loadUsers();
+      if(d.error){toast(d.error,true);return;}
+      toast('✅ Balance : '+d.newBalance.toLocaleString('fr-FR')+' cr.');
+      closeModal();loadUsers();
     });
 }
-
-// ── BAN ──
-function banUser(userId, action){
-  var label = action === 'ban' ? 'Bannir' : 'Débannir';
-  if(!confirm(label + ' le joueur ' + userId + ' ?')) return;
-  api('/api/admin/ban', { method:'POST', body: JSON.stringify({ userId: userId, action: action }) })
+function banUser(userId,action){
+  if(!confirm((action==='ban'?'Bannir':'Débannir')+' '+userId+' ?'))return;
+  api('/api/admin/ban',{method:'POST',body:JSON.stringify({userId:userId,action:action})})
     .then(function(d){
-      if(d.error){ toast(d.error, true); return; }
-      toast(action==='ban' ? '🚫 Joueur banni' : '✅ Joueur débanni');
-      loadUsers();
+      if(d.error){toast(d.error,true);return;}
+      toast(action==='ban'?'🚫 Banni':'✅ Débanni'); loadUsers();
     });
 }
-
-// ── RESET ──
 function resetUser(userId){
-  if(!confirm('Réinitialiser ' + userId + ' ? (Balance → 1000, stats à 0)')) return;
-  api('/api/admin/reset', { method:'POST', body: JSON.stringify({ userId: userId }) })
-    .then(function(d){
-      if(d.error){ toast(d.error, true); return; }
-      toast('🔄 Joueur réinitialisé');
-      loadUsers();
-    });
+  if(!confirm('Réinitialiser '+userId+' ?'))return;
+  api('/api/admin/reset',{method:'POST',body:JSON.stringify({userId:userId})})
+    .then(function(d){if(d.error){toast(d.error,true);return;}toast('🔄 Réinitialisé');loadUsers();});
 }
-
-// ── NUKE ──
 function doNuke(){
-  if(!confirm('⚠️ DERNIÈRE CHANCE — Vraiment tout détruire ?')) return;
-  api('/api/admin/nuke', { method:'POST', body: JSON.stringify({ confirm: 'PTIBLOND_NUKE' }) })
+  if(!confirm('⚠️ DERNIÈRE CHANCE — Vraiment tout détruire ?'))return;
+  api('/api/admin/nuke',{method:'POST',body:JSON.stringify({confirm:'PTIBLOND_NUKE'})})
     .then(function(d){
-      if(d.error){ toast(d.error, true); return; }
-      toast('💥 NUKE EFFECTUÉ — Toutes les données sont détruites', true);
-      document.getElementById('nuke-input').value = '';
-      document.getElementById('nuke-exec-btn').disabled = true;
+      if(d.error){toast(d.error,true);return;}
+      toast('💥 NUKE EFFECTUÉ',true);
+      document.getElementById('nuke-input').value='';
+      document.getElementById('nuke-exec-btn').disabled=true;
       loadAll();
     });
 }
-
-// ── LIVE FEED ──
 function addFeedItem(ev){
-  var icons = { roulette:'🎡', slots_spin:'🎰', slots_jackpot:'💰', blackjack:'🃏', duel_end:'⚔️', blackjack_web:'🃏' };
-  var icon = icons[ev.type] || '🎮';
-  var now = new Date().toLocaleTimeString('fr-FR');
-  var win = ev.win || (ev.gain && ev.gain > 0);
-  feedItems.unshift({ icon:icon, ev:ev, time:now, win:win });
-  if(feedItems.length > 60) feedItems.pop();
-  if(document.getElementById('page-feed').classList.contains('active')) renderFeed();
+  var icons={roulette:'🎡',slots_spin:'🎰',slots_jackpot:'💰',blackjack:'🃏',duel_end:'⚔️',blackjack_web:'🃏'};
+  var now=new Date().toLocaleTimeString('fr-FR');
+  feedItems.unshift({icon:icons[ev.type]||'🎮',ev:ev,time:now,win:ev.win||(ev.gain&&ev.gain>0)});
+  if(feedItems.length>60)feedItems.pop();
+  if(document.getElementById('page-feed').classList.contains('active'))renderFeed();
 }
 function renderFeed(){
-  var el = document.getElementById('feed-list');
-  if(!feedItems.length){ el.innerHTML='<div style="text-align:center;color:#2a2a2a;padding:40px">En attente d\'activité...</div>'; return; }
-  el.innerHTML = feedItems.map(function(f){
-    var cls = f.ev.type==='slots_jackpot'?'jackpot':f.win?'win':'lose';
-    var gain = f.ev.gain ? (f.ev.gain>0?'<span class="feed-gain pos">+'+f.ev.gain+'</span>':'<span class="feed-gain neg">'+f.ev.gain+'</span>') : '';
-    return '<div class="feed-item '+cls+'">'
-      + '<span class="feed-ico">'+f.icon+'</span>'
-      + '<div class="feed-txt"><strong>'+(f.ev.player||'?')+'</strong> — '+f.ev.type.replace(/_/g,' ')+(f.ev.number!==undefined?' n°'+f.ev.number:'')+'</div>'
-      + gain
-      + '<div class="feed-time">'+f.time+'</div>'
-      + '</div>';
+  var el=document.getElementById('feed-list');
+  if(!feedItems.length){el.innerHTML='<div style="text-align:center;color:#2a2a2a;padding:40px">En attente...</div>';return;}
+  el.innerHTML=feedItems.map(function(f){
+    var cls=f.ev.type==='slots_jackpot'?'jackpot':f.win?'win':'lose';
+    var gain=f.ev.gain?(f.ev.gain>0?'<span class="feed-gain pos">+'+f.ev.gain+'</span>':'<span class="feed-gain neg">'+f.ev.gain+'</span>'):'';
+    return '<div class="feed-item '+cls+'"><span class="feed-ico">'+f.icon+'</span>'
+      +'<div class="feed-txt"><strong>'+(f.ev.player||'?')+'</strong> — '+f.ev.type.replace(/_/g,' ')+(f.ev.number!==undefined?' n°'+f.ev.number:'')+'</div>'
+      +gain+'<div class="feed-time">'+f.time+'</div></div>';
   }).join('');
 }
-
-// ── SOCKET.IO ──
 function startSocket(){
-  var s; try{ s = io(); }catch(e){ return; }
-  s.on('live_event', function(ev){ addFeedItem(ev); });
-  s.on('economy_update', function(){ loadStats(); });
-  s.on('nuke', function(){ toast('💥 NUKE reçu — données effacées', true); loadAll(); });
-  s.on('ban_update', function(){ loadUsers(); });
-  s.on('discord_status', function(d){
-    document.getElementById('bot-status-txt').textContent = d.online ? ('Discord: '+d.tag) : 'Bot offline';
-  });
-  s.on('bot_ready', function(d){
-    document.getElementById('bot-status-txt').textContent = d.tag || 'Bot en ligne';
-  });
+  var s;try{s=io();}catch(e){return;}
+  s.on('live_event',function(ev){addFeedItem(ev);});
+  s.on('economy_update',function(){loadStats();});
+  s.on('nuke',function(){toast('💥 NUKE reçu',true);loadAll();});
+  s.on('ban_update',function(){loadUsers();});
+  s.on('bot_ready',function(d){document.getElementById('bot-status-txt').textContent=d.tag||'Bot en ligne';});
+  s.on('discord_status',function(d){document.getElementById('bot-status-txt').textContent=d.online?('Discord: '+d.tag):'Bot offline';});
 }
-
-// ── INIT ──
 document.getElementById('pwd-input').focus();
 </script>
 </body>
