@@ -3,8 +3,44 @@ const http     = require("http");
 const { Server } = require("socket.io");
 const path     = require("path");
 const fs       = require("fs");
-// Node 18+ a fetch natif, sinon on utilise node-fetch
+const { MongoClient } = require("mongodb");
 const fetch = globalThis.fetch || require("node-fetch");
+
+// ═══════════════════════════════════════
+//  MONGODB
+// ═══════════════════════════════════════
+const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://zertix1416_db_user:VCe8Ua9hQJm08FGA@cluster0.l3wo0a1.mongodb.net/?appName=Cluster0";
+let db = null;
+let playersCol = null;
+
+async function connectMongo() {
+    try {
+        const client = new MongoClient(MONGO_URI);
+        await client.connect();
+        db = client.db("casino");
+        playersCol = db.collection("players");
+        console.log("✅ MongoDB connecté");
+    } catch(e) {
+        console.error("❌ MongoDB erreur:", e.message);
+    }
+}
+
+async function getPlayer(id) {
+    if (!playersCol) return null;
+    return await playersCol.findOne({ _id: id });
+}
+
+async function savePlayer(id, data) {
+    if (!playersCol) return;
+    await playersCol.updateOne({ _id: id }, { $set: data }, { upsert: true });
+}
+
+async function getAllPlayers() {
+    if (!playersCol) return [];
+    return await playersCol.find({}).toArray();
+}
+
+connectMongo();
 
 const app    = express();
 const server = http.createServer(app);
@@ -20,7 +56,6 @@ global.io = io;
 // ═══════════════════════════════════════
 function loadJSON(file) {
     const tmpPath = '/tmp/' + path.basename(file);
-    // Priorité : /tmp/ (persist sur Render), sinon le fichier local
     for (const p of [tmpPath, file]) {
         if (fs.existsSync(p)) {
             try { return JSON.parse(fs.readFileSync(p, "utf8")); }
@@ -31,7 +66,6 @@ function loadJSON(file) {
 }
 function saveJSON(file, data) {
     const str = JSON.stringify(data, null, 2);
-    // Sauvegarde dans /tmp (persist Render) ET local
     try { fs.writeFileSync('/tmp/' + path.basename(file), str); } catch {}
     try { fs.writeFileSync(file, str); } catch {}
 }
@@ -85,11 +119,15 @@ app.get("/auth/callback", async (req, res) => {
             avatar:        user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/0.png`
         };
 
-        // Crée le joueur dans economy.json si pas existant
-        const eco = loadJSON("./economy.json");
-        if (!eco[user.id]) {
-            eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0, initialized: true };
-            saveJSON("./economy.json", eco);
+        // Crée le joueur dans MongoDB si pas existant — UNE SEULE FOIS
+        const existing = await getPlayer(user.id);
+        if (!existing) {
+            await savePlayer(user.id, {
+                _id: user.id,
+                username: user.username,
+                money: 1000, bank: 0, wins: 0, losses: 0,
+                games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0
+            });
         }
 
         // Redirige vers l'index avec le token en cookie via URL
@@ -101,13 +139,13 @@ app.get("/auth/callback", async (req, res) => {
 });
 
 // Récupère l'utilisateur connecté
-app.get("/auth/me", (req, res) => {
+app.get("/auth/me", async (req, res) => {
     const token = req.query.token || req.headers["x-session-token"];
     if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
     const user = sessions[token];
-    const eco = loadJSON("./economy.json");
-    const playerData = eco[user.id] || { money: 1000 };
-    res.json({ ...user, balance: playerData.money, stats: playerData });
+    const player = await getPlayer(user.id);
+    const balance = player ? player.money : 1000;
+    res.json({ ...user, balance, stats: player || {} });
 });
 
 // Déconnexion
@@ -210,34 +248,34 @@ function adminAuth(req, res, next) {
 }
 
 // Liste tous les joueurs
-app.get("/api/admin/users", adminAuth, (_req, res) => {
-    const eco = loadJSON("./economy.json");
-    const users = Object.entries(eco).map(([id, d]) => ({
-        id, ...d,
-        banned: !!bannedUsers[id]
+app.get("/api/admin/users", adminAuth, async (_req, res) => {
+    const players = await getAllPlayers();
+    const banned = loadJSON("./banned.json");
+    const users = players.map(p => ({
+        id: p._id, username: p.username || p._id,
+        money: p.money || 0, wins: p.wins || 0, losses: p.losses || 0,
+        games: p.games || 0, winstreak: p.winstreak || 0,
+        jackpots: p.jackpots || 0, banned: !!banned[p._id]
     })).sort((a, b) => b.money - a.money);
     res.json(users);
 });
 
 // Modifier la balance
-app.post("/api/admin/balance", adminAuth, (req, res) => {
+app.post("/api/admin/balance", adminAuth, async (req, res) => {
     const { userId, amount, action } = req.body;
-    const eco = loadJSON("./economy.json");
-    if (!eco[userId]) {
-        // Créer l'utilisateur s'il n'existe pas
-        eco[userId] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
+    let player = await getPlayer(userId);
+    if (!player) {
+        player = { _id: userId, money: 1000, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
     }
-    if (action === "set")    eco[userId].money = Math.max(0, Number(amount));
-    if (action === "add")    eco[userId].money = Math.max(0, eco[userId].money + Number(amount));
-    if (action === "remove") eco[userId].money = Math.max(0, eco[userId].money - Number(amount));
-    saveJSON("./economy.json", eco);
-    const newBalance = eco[userId].money;
-    // Notifier tous les clients web connectés avec cet ID
+    let newMoney = player.money || 0;
+    if (action === "set")    newMoney = Math.max(0, Number(amount));
+    if (action === "add")    newMoney = Math.max(0, newMoney + Number(amount));
+    if (action === "remove") newMoney = Math.max(0, newMoney - Number(amount));
+    await savePlayer(userId, { money: newMoney });
     if (global.io) {
-        global.io.emit("economy_update", eco);
-        global.io.emit("admin_balance_update", { userId, newBalance });
+        global.io.emit("admin_balance_update", { userId, newBalance: newMoney });
     }
-    res.json({ ok: true, newBalance });
+    res.json({ ok: true, newBalance: newMoney });
 });
 
 // Bannir / débannir
@@ -251,41 +289,35 @@ app.post("/api/admin/ban", adminAuth, (req, res) => {
 });
 
 // Reset un joueur
-app.post("/api/admin/reset", adminAuth, (req, res) => {
+app.post("/api/admin/reset", adminAuth, async (req, res) => {
     const { userId } = req.body;
-    const eco = loadJSON("./economy.json");
-    if (!eco[userId]) return res.status(404).json({ error: "User introuvable" });
-    eco[userId] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
-    saveJSON("./economy.json", eco);
+    await savePlayer(userId, { money: 1000, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 });
     res.json({ ok: true });
 });
 
-// NUKE — reset total de tout le monde
-app.post("/api/admin/nuke", adminAuth, (req, res) => {
+// NUKE
+app.post("/api/admin/nuke", adminAuth, async (req, res) => {
     const { confirm } = req.body;
     if (confirm !== "PTIBLOND_NUKE") return res.status(400).json({ error: "Confirmation requise" });
-    saveJSON("./economy.json", {});
+    if (playersCol) await playersCol.deleteMany({});
     saveJSON("./banned.json", {});
-    if (global.io) {
-        global.io.emit("nuke", { ts: Date.now() });
-        global.io.emit("economy_update", {});
-    }
-    res.json({ ok: true, message: "NUKE effectué — tout est détruit 💥" });
+    if (global.io) { global.io.emit("nuke", { ts: Date.now() }); }
+    res.json({ ok: true, message: "NUKE effectué 💥" });
 });
 
 // Stats globales admin
-app.get("/api/admin/stats", adminAuth, (_req, res) => {
-    const eco = loadJSON("./economy.json");
-    const players = Object.values(eco);
+app.get("/api/admin/stats", adminAuth, async (_req, res) => {
+    const players = await getAllPlayers();
+    const banned = loadJSON("./banned.json");
     const totalMoney = players.reduce((a, p) => a + (p.money || 0), 0);
     res.json({
         totalPlayers: players.length,
         totalMoney,
-        totalGames: players.reduce((a, p) => a + (p.games || 0), 0),
-        totalWins: players.reduce((a, p) => a + (p.wins || 0), 0),
-        totalJackpots: players.reduce((a, p) => a + (p.jackpots || 0), 0),
-        bannedCount: Object.keys(bannedUsers).length,
-        richest: players.sort((a, b) => b.money - a.money)[0]?.money || 0
+        totalGames:   players.reduce((a, p) => a + (p.games || 0), 0),
+        totalWins:    players.reduce((a, p) => a + (p.wins || 0), 0),
+        totalJackpots:players.reduce((a, p) => a + (p.jackpots || 0), 0),
+        bannedCount:  Object.keys(banned).length,
+        richest:      players.reduce((a, p) => Math.max(a, p.money || 0), 0)
     });
 });
 
