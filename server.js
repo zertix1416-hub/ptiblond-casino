@@ -230,7 +230,16 @@ app.post("/api/sync-balance", (req, res) => {
     res.json({ ok: true, balance: eco[discordId].money });
 });
 
-// --- Live Discord activity feed ---
+// Sauvegarde balance depuis le web (après chaque partie)
+app.post("/api/save-balance", async (req, res) => {
+    const { balance } = req.body;
+    const token = req.headers["x-session-token"];
+    if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
+    const user = sessions[token];
+    if (typeof balance !== "number" || balance < 0) return res.status(400).json({ error: "Balance invalide" });
+    await savePlayer(user.id, { money: Math.floor(balance) });
+    res.json({ ok: true, balance: Math.floor(balance) });
+});
 app.get("/api/live-feed", (_req, res) => {
     res.json(global.liveFeed || []);
 });

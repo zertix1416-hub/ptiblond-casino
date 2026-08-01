@@ -409,10 +409,16 @@ buildDeck();updateBetUI();showToast('Placez votre mise pour commencer');
     console.log('Jackpot:', d.slots);
   });
 
-  // Sync balance après chaque partie
+  // Sync balance après chaque partie — sauvegarde dans MongoDB
   function syncToServer(){
-    s.emit('balance_sync', { balance: pl.balance });
-    s.emit('game_event', { type: 'blackjack_web', balance: pl.balance, player: pl.name });
+    var token = localStorage.getItem('discord_session');
+    if(!token) return;
+    fetch('/api/save-balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+      body: JSON.stringify({ balance: balance })
+    }).catch(function(){});
+    s.emit('game_event', { type: 'blackjack_web', balance: balance, player: pl.name });
   }
 
   // Hook sur finishGame pour sync après chaque partie
