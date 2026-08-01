@@ -1,0 +1,551 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PTIBLOND Casino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  background: #020108;
+  color: #fff;
+  font-family: 'Georgia', serif;
+  overflow-x: hidden;
+}
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+#app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+  border-bottom: 1px solid rgba(255,215,0,0.15);
+}
+#logo {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 3px;
+}
+#topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+#balance-top {
+  color: #ffd700;
+  font-size: 14px;
+  font-family: 'Cinzel', serif;
+}
+#pseudo-input {
+  background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 20px;
+  padding: 7px 14px;
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  outline: none;
+  width: 130px;
+}
+#pseudo-input::placeholder { color: rgba(255,215,0,0.4); }
+#btn-enter {
+  background: linear-gradient(135deg, #c8a800, #8b6914);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  color: #000;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: transform 0.15s;
+}
+#btn-enter:hover { transform: scale(1.05); }
+
+/* HERO */
+#hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 20px;
+  text-align: center;
+}
+#crown {
+  font-size: 52px;
+  animation: floatCrown 3s ease-in-out infinite;
+  margin-bottom: 10px;
+  display: block;
+  filter: drop-shadow(0 0 20px rgba(255,215,0,0.6));
+}
+@keyframes floatCrown {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-14px); }
+}
+#hero-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: clamp(42px, 8vw, 88px);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffe066 0%, #ffd700 30%, #c8860a 60%, #ffd700 80%, #ffe066 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 8px;
+  text-shadow: none;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+#hero-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 6px;
+  color: rgba(255,215,0,0.5);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+/* TICKER */
+#ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  background: rgba(255,215,0,0.05);
+  border-top: 1px solid rgba(255,215,0,0.1);
+  border-bottom: 1px solid rgba(255,215,0,0.1);
+  padding: 8px 0;
+  margin-bottom: 40px;
+}
+#ticker-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: tickerScroll 20s linear infinite;
+}
+@keyframes tickerScroll {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(-100%); }
+}
+.tick-item {
+  display: inline-block;
+  margin: 0 30px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.tick-win  { color: #00e676; }
+.tick-name { color: rgba(255,215,0,0.7); }
+
+/* CARDS GRID */
+#cards-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 20px 40px;
+}
+.game-card {
+  width: 260px;
+  background: linear-gradient(160deg, #0d0b1a 0%, #110e20 100%);
+  border-radius: 16px;
+  padding: 28px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  transform-style: preserve-3d;
+  perspective: 800px;
+}
+.game-card:hover {
+  transform: translateY(-8px) rotateY(4deg);
+}
+.game-card.bj  { border: 1px solid rgba(0,232,122,0.35); box-shadow: 0 0 30px rgba(0,232,122,0.1); }
+.game-card.rl  { border: 1px solid rgba(255,51,68,0.35);  box-shadow: 0 0 30px rgba(255,51,68,0.1); }
+.game-card.sl  { border: 1px solid rgba(255,215,0,0.35);  box-shadow: 0 0 30px rgba(255,215,0,0.1); }
+.game-card.bj:hover { box-shadow: 0 12px 40px rgba(0,232,122,0.25); }
+.game-card.rl:hover { box-shadow: 0 12px 40px rgba(255,51,68,0.25); }
+.game-card.sl:hover { box-shadow: 0 12px 40px rgba(255,215,0,0.3); }
+
+.card-glow {
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  opacity: 0.08;
+  pointer-events: none;
+}
+.bj .card-glow  { background: #00e87a; }
+.rl .card-glow  { background: #ff3344; }
+.sl .card-glow  { background: #ffd700; }
+.game-card:hover .card-glow { opacity: 0.18; }
+
+.card-icon {
+  font-size: 46px;
+  display: block;
+  margin-bottom: 14px;
+  animation: iconFloat 4s ease-in-out infinite;
+}
+.game-card:nth-child(2) .card-icon { animation-delay: 0.8s; }
+.game-card:nth-child(3) .card-icon { animation-delay: 1.6s; }
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-6px) scale(1.05); }
+}
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.bj .card-title  { color: #00e87a; }
+.rl .card-title  { color: #ff3344; }
+.sl .card-title  { color: #ffd700; }
+.card-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.5px;
+}
+.bj .tag { background: rgba(0,232,122,0.12); color: #00e87a; border: 1px solid rgba(0,232,122,0.2); }
+.rl .tag { background: rgba(255,51,68,0.12);  color: #ff3344; border: 1px solid rgba(255,51,68,0.2); }
+.sl .tag { background: rgba(255,215,0,0.12);  color: #ffd700; border: 1px solid rgba(255,215,0,0.2); }
+
+/* JACKPOT BAR */
+#jackpot-bar {
+  background: linear-gradient(to right, #0d0b00, #1a1400, #0d0b00);
+  border-top: 1px solid rgba(255,215,0,0.25);
+  padding: 12px 20px;
+  text-align: center;
+  overflow: hidden;
+}
+#jackpot-amount {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffd700, #ffaa00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 3px;
+  animation: jackpotPulse 2s ease-in-out infinite;
+}
+@keyframes jackpotPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
+}
+#jackpot-label {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: rgba(255,215,0,0.4);
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<div id="app">
+  <div id="topbar">
+    <div id="logo">&#9824; PTIBLOND CASINO</div>
+    <div id="topbar-right">
+      <div id="balance-top">Balance : <span id="bal-val">1 000</span> &euro;</div>
+      <input id="pseudo-input" type="text" placeholder="Votre pseudo..." maxlength="16"/>
+      <button id="btn-enter" onclick="enterCasino()">ENTRER</button>
+    </div>
+  </div>
+
+  <div id="hero">
+    <span id="crown">&#128081;</span>
+    <div id="hero-title">PTIBLOND</div>
+    <div id="hero-sub">Casino Premium &bull; Jeux en Direct &bull; VIP</div>
+
+    <div id="ticker-wrap">
+      <div id="ticker-track">
+        <span class="tick-item"><span class="tick-name">MaxBet99</span> <span class="tick-win">+4 500 EUR</span> au Blackjack</span>
+        <span class="tick-item"><span class="tick-name">LuckyKing</span> <span class="tick-win">+12 000 EUR</span> a la Roulette</span>
+        <span class="tick-item"><span class="tick-name">VIPStar</span> <span class="tick-win">+7 777 EUR</span> aux Slots</span>
+        <span class="tick-item"><span class="tick-name">HighRoller</span> <span class="tick-win">+22 500 EUR</span> au Blackjack</span>
+        <span class="tick-item"><span class="tick-name">GoldHand</span> <span class="tick-win">+3 200 EUR</span> a la Roulette</span>
+        <span class="tick-item"><span class="tick-name">Nightfall</span> <span class="tick-win">+9 100 EUR</span> aux Slots</span>
+      </div>
+    </div>
+
+    <div id="cards-grid">
+      <a href="blackjack.html" class="game-card bj">
+        <div class="card-glow"></div>
+        <span class="card-icon">&#127137;</span>
+        <div class="card-title">BLACKJACK</div>
+        <div class="card-desc">Battez le dealer et approchez 21 sans depasser. Blackjack paye 3 pour 2.</div>
+        <div class="card-tags">
+          <span class="tag">3:2</span>
+          <span class="tag">Double</span>
+          <span class="tag">Multi-mains</span>
+        </div>
+      </a>
+
+      <a href="roulette.html" class="game-card rl">
+        <div class="card-glow"></div>
+        <span class="card-icon">&#127922;</span>
+        <div class="card-title">ROULETTE</div>
+        <div class="card-desc">La roue tourne, les mises s'enflamment. Rouge, noir ou votre numero chanceux.</div>
+        <div class="card-tags">
+          <span class="tag">Europeenne</span>
+          <span class="tag">35:1</span>
+          <span class="tag">Live</span>
+        </div>
+      </a>
+
+      <a href="slots.html" class="game-card sl">
+        <div class="card-glow"></div>
+        <span class="card-icon">&#127381;</span>
+        <div class="card-title">SLOTS</div>
+        <div class="card-desc">Tours gratuits, multiplicateurs et jackpots progressifs vous attendent.</div>
+        <div class="card-tags">
+          <span class="tag">Jackpot</span>
+          <span class="tag">Free Spins</span>
+          <span class="tag">x500</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div id="jackpot-bar">
+    <div id="jackpot-label">Jackpot Progressif</div>
+    <div id="jackpot-amount">&#128176; <span id="jackpot-val">247 831</span> EUR &#128176;</div>
+  </div>
+</div>
+
+<script>
+// ---- Canvas background: gold dust particles + floating card/chip shapes ----
+var canvas = document.getElementById('bg-canvas');
+var ctx = canvas.getContext('2d');
+var particles = [];
+var shapes = [];
+var W, H;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.onresize = resize;
+resize();
+
+// Gold dust particles
+function makeParticle() {
+  return {
+    x: Math.random() * W,
+    y: H + Math.random() * 40,
+    r: Math.random() * 1.8 + 0.4,
+    sp: Math.random() * 0.5 + 0.2,
+    dx: (Math.random() - 0.5) * 0.3,
+    op: Math.random() * 0.5 + 0.1
+  };
+}
+
+function makeShape() {
+  var types = ['card', 'chip'];
+  return {
+    type: types[Math.floor(Math.random() * types.length)],
+    x: Math.random() * W,
+    y: Math.random() * H,
+    rot: Math.random() * Math.PI * 2,
+    drot: (Math.random() - 0.5) * 0.003,
+    sp: Math.random() * 0.2 + 0.05,
+    op: Math.random() * 0.06 + 0.02,
+    size: Math.random() * 20 + 14
+  };
+}
+
+var i;
+for (i = 0; i < 120; i++) {
+  var p = makeParticle();
+  p.y = Math.random() * H;
+  particles.push(p);
+}
+for (i = 0; i < 18; i++) {
+  shapes.push(makeShape());
+}
+
+function drawCard2D(x, y, w, h, rot, op) {
+  ctx.save();
+  ctx.globalAlpha = op;
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.strokeStyle = 'rgba(255,215,0,0.6)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  var r = 3;
+  ctx.moveTo(-w/2 + r, -h/2);
+  ctx.lineTo(w/2 - r, -h/2);
+  ctx.arcTo(w/2, -h/2, w/2, -h/2 + r, r);
+  ctx.lineTo(w/2, h/2 - r);
+  ctx.arcTo(w/2, h/2, w/2 - r, h/2, r);
+  ctx.lineTo(-w/2 + r, h/2);
+  ctx.arcTo(-w/2, h/2, -w/2, h/2 - r, r);
+  ctx.lineTo(-w/2, -h/2 + r);
+  ctx.arcTo(-w/2, -h/2, -w/2 + r, -h/2, r);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawChip2D(x, y, r, rot, op) {
+  ctx.save();
+  ctx.globalAlpha = op;
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.strokeStyle = 'rgba(255,215,0,0.5)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.75, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function animBG() {
+  ctx.clearRect(0, 0, W, H);
+  var j;
+
+  // Shapes
+  for (j = 0; j < shapes.length; j++) {
+    var s = shapes[j];
+    s.y -= s.sp;
+    s.rot += s.drot;
+    if (s.y < -60) { s.y = H + 60; s.x = Math.random() * W; }
+    if (s.type === 'card') {
+      drawCard2D(s.x, s.y, s.size * 0.7, s.size, s.rot, s.op);
+    } else {
+      drawChip2D(s.x, s.y, s.size / 2, s.rot, s.op);
+    }
+  }
+
+  // Particles
+  for (j = 0; j < particles.length; j++) {
+    var p = particles[j];
+    p.y -= p.sp;
+    p.x += p.dx;
+    if (p.y < -5) {
+      particles[j] = makeParticle();
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,215,0,' + p.op + ')';
+    ctx.fill();
+  }
+  requestAnimationFrame(animBG);
+}
+animBG();
+
+// Jackpot ticker
+var jackpot = 247831;
+function tickJackpot() {
+  jackpot += Math.floor(Math.random() * 5) + 1;
+  document.getElementById('jackpot-val').textContent = jackpot.toLocaleString('fr-FR');
+  setTimeout(tickJackpot, 800 + Math.floor(Math.random() * 400));
+}
+tickJackpot();
+
+// Balance display
+var playerBal = 1000;
+function updateBal() {
+  document.getElementById('bal-val').textContent = playerBal.toLocaleString('fr-FR');
+}
+updateBal();
+
+function enterCasino() {
+  var p = document.getElementById('pseudo-input').value.trim();
+  if (!p) { p = 'Joueur'; }
+  document.getElementById('bal-val').textContent = playerBal.toLocaleString('fr-FR');
+}
+
+// Try socket.io silently
+try {
+  if (typeof io !== 'undefined') {
+    var socket = io();
+    socket.on('balance', function(data) {
+      if (data && data.balance !== undefined) {
+        playerBal = data.balance;
+        updateBal();
+      }
+    });
+  }
+} catch(e) {}
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(function(){
+  var s; try{ s=io(); }catch(e){ return; }
+  s.on('connect',function(){
+    var pl=JSON.parse(localStorage.getItem('casino_player')||'{"name":"Invite","balance":1000}');
+    s.emit('identify',{name:pl.name,balance:pl.balance});
+  });
+  s.on('discord_status',function(d){
+    if(d.online){
+      var el=document.getElementById('tk-online');
+      if(el) el.textContent='● Discord: '+d.tag+' en ligne';
+    }
+  });
+  s.on('online_count',function(n){
+    var el=document.getElementById('tk-online');
+    if(el) el.textContent='● '+n+' en ligne';
+  });
+  s.on('jackpot_update',function(d){
+    if(d.slots){
+      var el=document.getElementById('jackpot-val');
+      if(el) el.textContent=d.slots.toLocaleString('fr-FR');
+    }
+  });
+  s.on('live_event',function(ev){
+    var track=document.getElementById('ticker-inner');
+    if(!track) return;
+    var icons={roulette:'🎡',slots_spin:'🎰',slots_jackpot:'💰',blackjack:'🃏',duel_end:'⚔️',blackjack_web:'🃏'};
+    var icon=icons[ev.type]||'🎮';
+    var name=ev.player||'Joueur';
+    var gain='';
+    if(ev.gain>0) gain=' +'+ev.gain.toLocaleString('fr-FR')+'cr';
+    track.innerHTML=icon+' '+name+(ev.type==='roulette'?(' — Roulette n°'+ev.number+(ev.win?' ✅':' ❌')):(' — '+ev.type.replace('_',' ')))+gain+'   ●   '+track.innerHTML.slice(0,120);
+  });
+  s.on('economy_update',function(){
+    // Refresh jackpot si besoin
+  });
+})();
+</script></body>
+</html>

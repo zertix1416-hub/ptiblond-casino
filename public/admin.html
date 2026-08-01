@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Panel — PTIBLOND</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;min-height:100%;background:#060608;font-family:'Rajdhani',sans-serif;color:#fff}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;
+  justify-content:center;background:#060608}
+#login-box{background:linear-gradient(145deg,#0e0c1a,#080612);
+  border:1px solid rgba(220,50,50,.35);border-radius:20px;
+  padding:52px 64px;text-align:center;width:380px;
+  box-shadow:0 0 60px rgba(220,50,50,.1),0 40px 80px rgba(0,0,0,.9)}
+#login-box .shield{font-size:4rem;margin-bottom:16px;display:block;
+  filter:drop-shadow(0 0 20px rgba(220,50,50,.5))}
+#login-box h1{font-family:'Oswald',sans-serif;font-size:1.6rem;letter-spacing:4px;
+  color:#e53935;margin-bottom:6px}
+#login-box p{font-size:.8rem;color:#444;letter-spacing:1px;margin-bottom:28px}
+#pwd-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(220,50,50,.3);
+  border-radius:10px;padding:12px 18px;color:#fff;font-size:1rem;
+  font-family:'Rajdhani',sans-serif;outline:none;text-align:center;letter-spacing:3px;
+  transition:border-color .2s}
+#pwd-input:focus{border-color:#e53935;box-shadow:0 0 20px rgba(220,50,50,.2)}
+#login-btn{width:100%;margin-top:14px;padding:13px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,#8b0000,#e53935,#8b0000);
+  color:#fff;font-family:'Oswald',sans-serif;font-size:.9rem;letter-spacing:2px;
+  cursor:pointer;transition:.2s;font-weight:600}
+#login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(220,50,50,.4)}
+#login-err{color:#e53935;font-size:.8rem;margin-top:10px;min-height:18px}
+
+/* ── LAYOUT ── */
+#app{display:none;min-height:100vh}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;
+  background:linear-gradient(180deg,rgba(10,8,18,.99),rgba(6,4,12,.99));
+  border-right:1px solid rgba(220,50,50,.12);
+  display:flex;flex-direction:column;padding:24px 0;z-index:50}
+#content{margin-left:240px;padding:0;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar-logo{padding:0 20px 28px;border-bottom:1px solid rgba(220,50,50,.1);margin-bottom:16px}
+.sidebar-logo .icon{font-size:1.8rem;display:block;margin-bottom:4px;
+  filter:drop-shadow(0 0 12px rgba(220,50,50,.5))}
+.sidebar-logo h2{font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:3px;
+  color:#e53935;line-height:1}
+.sidebar-logo small{font-size:.62rem;color:#333;letter-spacing:2px}
+.nav-lbl{font-size:.55rem;letter-spacing:3px;color:#2a2a2a;text-transform:uppercase;
+  padding:12px 22px 6px;font-family:'Oswald',sans-serif}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:12px 22px;
+  cursor:pointer;transition:.2s;border-left:3px solid transparent;
+  font-size:.88rem;color:#555;letter-spacing:.5px}
+.nav-btn:hover{background:rgba(220,50,50,.06);color:#bbb;border-left-color:rgba(220,50,50,.3)}
+.nav-btn.active{background:rgba(220,50,50,.1);color:#e53935;border-left-color:#e53935}
+.nav-btn .ico{font-size:1.1rem;width:20px;text-align:center}
+.sidebar-bottom{margin-top:auto;padding:20px;border-top:1px solid rgba(255,255,255,.04)}
+.logout-btn{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(220,50,50,.3);
+  background:rgba(220,50,50,.06);color:#e53935;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:.8rem;letter-spacing:1.5px;transition:.2s}
+.logout-btn:hover{background:rgba(220,50,50,.15)}
+
+/* ── TOP BAR ── */
+#topbar{background:rgba(6,4,12,.98);border-bottom:1px solid rgba(255,255,255,.04);
+  padding:16px 32px;display:flex;align-items:center;gap:16px;
+  position:sticky;top:0;z-index:40}
+#topbar h1{font-family:'Oswald',sans-serif;font-size:1.1rem;letter-spacing:3px;color:#ddd}
+#topbar .sp{flex:1}
+.status-badge{display:flex;align-items:center;gap:8px;background:rgba(0,200,80,.06);
+  border:1px solid rgba(0,200,80,.2);border-radius:8px;padding:6px 14px;
+  font-size:.75rem;color:#00c850}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#00c850;
+  animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.refresh-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:8px 16px;color:#888;cursor:pointer;
+  font-size:.78rem;transition:.2s;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
+.refresh-btn:hover{background:rgba(255,255,255,.09);color:#ccc}
+
+/* ── PAGES ── */
+.page{display:none;padding:28px 32px;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page-title{font-family:'Oswald',sans-serif;font-size:1.4rem;letter-spacing:3px;
+  color:#ddd;margin-bottom:24px;display:flex;align-items:center;gap:12px}
+.page-title span{font-size:1.6rem}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+.scard{background:linear-gradient(145deg,rgba(14,12,24,.95),rgba(8,6,16,.98));
+  border-radius:14px;padding:20px 22px;position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,.05);transition:.25s}
+.scard:hover{border-color:rgba(255,255,255,.1);transform:translateY(-2px)}
+.scard .sl{font-size:.58rem;letter-spacing:2px;color:#444;text-transform:uppercase;
+  font-family:'Oswald',sans-serif;margin-bottom:6px}
+.scard .sv{font-size:1.8rem;font-weight:700;font-family:'Oswald',sans-serif}
+.scard .si{position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  font-size:2.2rem;opacity:.12}
+.scard.red .sv{color:#e53935}.scard.green .sv{color:#00c850}
+.scard.gold .sv{color:#c8a032}.scard.blue .sv{color:#2979ff}
+.scard.purple .sv{color:#9c27b0}
+
+/* ── TABLE ── */
+.table-wrap{background:linear-gradient(145deg,rgba(12,10,22,.98),rgba(8,6,16,.99));
+  border-radius:16px;border:1px solid rgba(255,255,255,.05);overflow:hidden}
+.table-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;gap:12px}
+.table-header h3{font-family:'Oswald',sans-serif;font-size:.9rem;letter-spacing:2px;color:#888}
+.table-header .sp{flex:1}
+.search-input{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:7px 14px;color:#fff;font-size:.8rem;
+  outline:none;width:200px;font-family:'Rajdhani',sans-serif;transition:.2s}
+.search-input:focus{border-color:rgba(220,50,50,.4);background:rgba(255,255,255,.07)}
+.search-input::placeholder{color:#333}
+table{width:100%;border-collapse:collapse}
+thead th{padding:12px 16px;text-align:left;font-size:.6rem;letter-spacing:2px;
+  color:#333;text-transform:uppercase;font-family:'Oswald',sans-serif;
+  border-bottom:1px solid rgba(255,255,255,.05)}
+tbody tr{transition:.15s;border-bottom:1px solid rgba(255,255,255,.02)}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tbody tr.banned-row{background:rgba(220,50,50,.04)}
+tbody tr.banned-row:hover{background:rgba(220,50,50,.07)}
+td{padding:11px 16px;font-size:.84rem;vertical-align:middle}
+.td-id{color:#333;font-size:.68rem;font-family:'Oswald',sans-serif;letter-spacing:.5px}
+.td-bal{color:#c8a032;font-weight:600;font-family:'Oswald',sans-serif}
+.td-wins{color:#00c850}.td-losses{color:#e53935}
+.td-games{color:#888}.td-ws{color:#2979ff}.td-jk{color:#9c27b0}
+.banned-tag{background:rgba(220,50,50,.15);border:1px solid rgba(220,50,50,.3);
+  border-radius:4px;padding:2px 8px;font-size:.62rem;color:#e53935;
+  font-family:'Oswald',sans-serif;letter-spacing:1px}
+.online-tag{background:rgba(0,200,80,.1);border:1px solid rgba(0,200,80,.25);
+  border-radius:4px;padding:2px 8px;font-size:.62px;color:#00c850;
+  font-family:'Oswald',sans-serif;letter-spacing:1px}
+
+/* ── ACTION BUTTONS ── */
+.act-group{display:flex;gap:5px;flex-wrap:nowrap}
+.abtn{border:none;cursor:pointer;border-radius:6px;padding:5px 10px;
+  font-size:.68rem;font-weight:600;transition:.15s;
+  font-family:'Oswald',sans-serif;letter-spacing:.5px;white-space:nowrap}
+.abtn:hover{transform:translateY(-1px);filter:brightness(1.2)}
+.abtn.add{background:rgba(0,200,80,.15);color:#00c850;border:1px solid rgba(0,200,80,.2)}
+.abtn.remove{background:rgba(220,50,50,.12);color:#e53935;border:1px solid rgba(220,50,50,.2)}
+.abtn.set{background:rgba(200,160,50,.12);color:#c8a032;border:1px solid rgba(200,160,50,.2)}
+.abtn.ban{background:rgba(220,50,50,.15);color:#e53935;border:1px solid rgba(220,50,50,.25)}
+.abtn.unban{background:rgba(0,200,80,.12);color:#00c850;border:1px solid rgba(0,200,80,.2)}
+.abtn.reset{background:rgba(41,121,255,.12);color:#2979ff;border:1px solid rgba(41,121,255,.2)}
+.abtn.nuke-row{background:rgba(255,100,0,.12);color:#ff6600;border:1px solid rgba(255,100,0,.2)}
+
+/* ── MODAL ── */
+#modal-overlay{position:fixed;inset:0;z-index:150;display:none;
+  align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(14px)}
+#modal-overlay.show{display:flex}
+#modal{background:linear-gradient(145deg,#0e0c1a,#080612);
+  border-radius:18px;padding:40px 48px;min-width:380px;text-align:center;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 0 80px rgba(0,0,0,.8);
+  animation:mIn .3s cubic-bezier(.34,1.4,.64,1)}
+@keyframes mIn{from{transform:scale(.7) translateY(20px);opacity:0}to{transform:none;opacity:1}}
+#modal h2{font-family:'Oswald',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:6px}
+#modal p{font-size:.82rem;color:#555;margin-bottom:20px;line-height:1.7}
+#modal-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:12px 18px;color:#fff;font-size:1rem;
+  font-family:'Rajdhani',sans-serif;outline:none;text-align:center;
+  transition:.2s;margin-bottom:16px}
+#modal-input:focus{border-color:rgba(200,160,50,.5)}
+.modal-btns{display:flex;gap:10px}
+.mbtn{flex:1;padding:12px;border-radius:10px;border:none;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:1.5px;transition:.2s}
+.mbtn.confirm{background:linear-gradient(135deg,#7a5a10,#c8a032,#7a5a10);color:#000;font-weight:700}
+.mbtn.confirm:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,160,50,.35)}
+.mbtn.cancel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#777}
+.mbtn.cancel:hover{background:rgba(255,255,255,.1);color:#aaa}
+
+/* ── NUKE PAGE ── */
+#nuke-zone{background:linear-gradient(145deg,rgba(20,5,5,.98),rgba(12,3,3,.99));
+  border:1px solid rgba(220,50,50,.25);border-radius:16px;padding:40px;text-align:center;
+  margin-top:20px;position:relative;overflow:hidden}
+#nuke-zone::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(220,50,50,.08) 0%,transparent 65%);pointer-events:none}
+.nuke-icon{font-size:5rem;display:block;margin-bottom:16px;
+  animation:nukeFloat 3s ease-in-out infinite}
+@keyframes nukeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#nuke-zone h2{font-family:'Oswald',sans-serif;font-size:2rem;letter-spacing:4px;
+  color:#e53935;margin-bottom:8px;text-shadow:0 0 30px rgba(220,50,50,.5)}
+#nuke-zone p{color:#555;font-size:.85rem;max-width:500px;margin:0 auto 28px;line-height:1.8}
+.nuke-warning{background:rgba(220,50,50,.08);border:1px solid rgba(220,50,50,.2);
+  border-radius:10px;padding:14px 20px;margin-bottom:24px;font-size:.8rem;color:#cc4444;
+  text-align:left;line-height:1.9}
+.nuke-confirm-input{background:rgba(220,50,50,.06);border:1px solid rgba(220,50,50,.3);
+  border-radius:10px;padding:12px 20px;color:#e53935;font-size:.9rem;
+  font-family:'Oswald',sans-serif;letter-spacing:3px;text-align:center;
+  outline:none;width:100%;max-width:400px;margin-bottom:16px}
+.nuke-btn{background:linear-gradient(135deg,#6b0000,#e53935,#6b0000);
+  color:#fff;border:none;border-radius:12px;padding:16px 48px;
+  font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:3px;
+  cursor:pointer;transition:.2s;font-weight:700;
+  box-shadow:0 0 30px rgba(220,50,50,.3)}
+.nuke-btn:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(220,50,50,.5)}
+.nuke-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+
+/* ── LIVE FEED ── */
+#feed-list{display:flex;flex-direction:column;gap:8px;max-height:500px;overflow-y:auto}
+#feed-list::-webkit-scrollbar{width:4px}
+#feed-list::-webkit-scrollbar-thumb{background:rgba(220,50,50,.3);border-radius:2px}
+.feed-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
+  border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;
+  animation:feedSlide .3s ease}
+@keyframes feedSlide{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.feed-item.win{border-left:3px solid #00c850}
+.feed-item.lose{border-left:3px solid #e53935}
+.feed-item.jackpot{border-left:3px solid #c8a032;background:rgba(200,160,50,.04)}
+.feed-ico{font-size:1.4rem}
+.feed-txt{flex:1;font-size:.82rem;color:#888}
+.feed-txt strong{color:#ddd}
+.feed-time{font-size:.68rem;color:#333}
+.feed-gain.pos{color:#00c850;font-weight:700}
+.feed-gain.neg{color:#e53935;font-weight:700}
+
+/* ── TOAST ── */
+#admin-toast{position:fixed;top:20px;right:20px;z-index:200;
+  background:rgba(0,200,80,.9);border-radius:10px;padding:12px 22px;
+  font-size:.85rem;color:#000;font-weight:700;font-family:'Oswald',sans-serif;
+  letter-spacing:1px;opacity:0;transition:.3s;pointer-events:none}
+#admin-toast.show{opacity:1}
+#admin-toast.error{background:rgba(220,50,50,.92);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div id="login-box">
+    <span class="shield">🛡️</span>
+    <h1>ADMIN PANEL</h1>
+    <p>PTIBLOND CASINO — ACCÈS RESTREINT</p>
+    <input id="pwd-input" type="password" placeholder="Mot de passe..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button id="login-btn" onclick="doLogin()">ACCÉDER</button>
+    <div id="login-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-logo">
+      <span class="icon">🎰</span>
+      <h2>PTIBLOND</h2>
+      <small>ADMIN PANEL</small>
+    </div>
+    <span class="nav-lbl">Navigation</span>
+    <div class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <span class="ico">📊</span> Dashboard
+    </div>
+    <div class="nav-btn" onclick="showPage('users')" id="nav-users">
+      <span class="ico">👥</span> Joueurs
+    </div>
+    <div class="nav-btn" onclick="showPage('feed')" id="nav-feed">
+      <span class="ico">⚡</span> Flux Live
+    </div>
+    <span class="nav-lbl">Danger</span>
+    <div class="nav-btn" onclick="showPage('nuke')" id="nav-nuke">
+      <span class="ico">💥</span> Zone NUKE
+    </div>
+    <div class="sidebar-bottom">
+      <button class="logout-btn" onclick="doLogout()">DÉCONNEXION</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+    <!-- TOP BAR -->
+    <div id="topbar">
+      <h1 id="page-title">DASHBOARD</h1>
+      <div class="sp"></div>
+      <div class="status-badge" id="bot-status-badge">
+        <div class="status-dot"></div>
+        <span id="bot-status-txt">Bot connecté</span>
+      </div>
+      <button class="refresh-btn" onclick="loadAll()">🔄 Actualiser</button>
+    </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="stats-grid">
+        <div class="scard gold"><div class="sl">Joueurs</div><div class="sv" id="s-players">—</div><div class="si">👥</div></div>
+        <div class="scard green"><div class="sl">Argent Total</div><div class="sv" id="s-money">—</div><div class="si">💰</div></div>
+        <div class="scard blue"><div class="sl">Parties</div><div class="sv" id="s-games">—</div><div class="si">🎮</div></div>
+        <div class="scard purple"><div class="sl">Jackpots</div><div class="sv" id="s-jackpots">—</div><div class="si">👑</div></div>
+        <div class="scard red"><div class="sl">Bannis</div><div class="sv" id="s-banned">—</div><div class="si">🚫</div></div>
+        <div class="scard gold"><div class="sl">Fortune Max</div><div class="sv" id="s-richest">—</div><div class="si">🏆</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>TOP 10 JOUEURS</h3>
+        </div>
+        <table><thead><tr>
+          <th>Rang</th><th>ID Discord</th><th>Balance</th><th>V</th><th>D</th><th>Parties</th><th>Jackpots</th><th>Statut</th>
+        </tr></thead>
+        <tbody id="top10-body"></tbody></table>
+      </div>
+    </div>
+
+    <!-- USERS PAGE -->
+    <div class="page" id="page-users">
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>TOUS LES JOUEURS</h3>
+          <div class="sp"></div>
+          <input class="search-input" id="search-input" placeholder="Chercher un ID..." oninput="filterUsers()">
+        </div>
+        <table><thead><tr>
+          <th>ID Discord</th><th>Balance</th><th>Victoires</th><th>Défaites</th>
+          <th>Parties</th><th>W.Streak</th><th>Jackpots</th><th>Statut</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="users-body"></tbody></table>
+      </div>
+    </div>
+
+    <!-- LIVE FEED PAGE -->
+    <div class="page" id="page-feed">
+      <div class="table-wrap" style="border-radius:16px;overflow:hidden">
+        <div class="table-header">
+          <h3>ACTIVITÉ EN DIRECT</h3>
+          <div class="sp"></div>
+          <span style="font-size:.72rem;color:#444">Discord + Web</span>
+        </div>
+        <div style="padding:16px">
+          <div id="feed-list">
+            <div style="text-align:center;color:#333;padding:40px;font-size:.85rem">
+              En attente d'activité...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NUKE PAGE -->
+    <div class="page" id="page-nuke">
+      <div style="max-width:680px;margin:0 auto">
+        <div id="nuke-zone">
+          <span class="nuke-icon">☢️</span>
+          <h2>ZONE NUKE</h2>
+          <p>Cette action va supprimer <strong style="color:#e53935">TOUTES</strong> les données —
+            balances, statistiques, historique, bans.<br>
+            Irréversible. Tout le monde repart de zéro.</p>
+
+          <div class="nuke-warning">
+            ⚠️ <strong>ATTENTION :</strong> Cette action :<br>
+            — Remet toutes les balances à 0<br>
+            — Supprime toutes les statistiques<br>
+            — Retire tous les bans<br>
+            — Notifie tous les clients connectés en temps réel<br>
+            — <strong>NE PEUT PAS ÊTRE ANNULÉE</strong>
+          </div>
+
+          <input class="nuke-confirm-input" id="nuke-input"
+            placeholder="Tape PTIBLOND_NUKE pour confirmer"
+            oninput="document.getElementById('nuke-exec-btn').disabled=this.value!=='PTIBLOND_NUKE'">
+          <br><br>
+          <button class="nuke-btn" id="nuke-exec-btn" onclick="doNuke()" disabled>
+            💥 LANCER LE NUKE
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h2 id="modal-title">Action</h2>
+    <p id="modal-desc">Description</p>
+    <input id="modal-input" type="number" placeholder="Montant" min="0">
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal()">Annuler</button>
+      <button class="mbtn confirm" id="modal-confirm-btn" onclick="confirmModal()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div id="admin-toast"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div id="login-box">
+    <span class="shield">🛡️</span>
+    <h1>ADMIN PANEL</h1>
+    <p>PTIBLOND CASINO — ACCÈS RESTREINT</p>
+    <input id="pwd-input" type="password" placeholder="Mot de passe..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button id="login-btn" onclick="doLogin()">ACCÉDER</button>
+    <div id="login-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="sidebar">
+    <div class="sidebar-logo">
+      <span class="icon">🎰</span>
+      <h2>PTIBLOND</h2>
+      <small>ADMIN PANEL</small>
+    </div>
+    <span class="nav-lbl">Navigation</span>
+    <div class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <span class="ico">📊</span> Dashboard
+    </div>
+    <div class="nav-btn" onclick="showPage('users')" id="nav-users">
+      <span class="ico">👥</span> Joueurs
+    </div>
+    <div class="nav-btn" onclick="showPage('feed')" id="nav-feed">
+      <span class="ico">⚡</span> Flux Live
+    </div>
+    <span class="nav-lbl">Danger</span>
+    <div class="nav-btn" onclick="showPage('nuke')" id="nav-nuke">
+      <span class="ico">💥</span> Zone NUKE
+    </div>
+    <div class="sidebar-bottom">
+      <button class="logout-btn" onclick="doLogout()">DÉCONNEXION</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="topbar">
+      <h1 id="page-title">DASHBOARD</h1>
+      <div class="sp"></div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span id="bot-status-txt">Vérification...</span>
+      </div>
+      <button class="refresh-btn" onclick="loadAll()">🔄 Actualiser</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="stats-grid">
+        <div class="scard gold"><div class="sl">Joueurs</div><div class="sv" id="s-players">—</div><div class="si">👥</div></div>
+        <div class="scard green"><div class="sl">Argent Total</div><div class="sv" id="s-money">—</div><div class="si">💰</div></div>
+        <div class="scard blue"><div class="sl">Parties Jouées</div><div class="sv" id="s-games">—</div><div class="si">🎮</div></div>
+        <div class="scard purple"><div class="sl">Jackpots</div><div class="sv" id="s-jackpots">—</div><div class="si">👑</div></div>
+        <div class="scard red"><div class="sl">Bannis</div><div class="sv" id="s-banned">—</div><div class="si">🚫</div></div>
+        <div class="scard gold"><div class="sl">Fortune Max</div><div class="sv" id="s-richest">—</div><div class="si">🏆</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header"><h3>TOP 10 JOUEURS</h3></div>
+        <table><thead><tr>
+          <th>Rang</th><th>ID Discord</th><th>Balance</th><th>V</th><th>D</th><th>Parties</th><th>Jackpots</th><th>Statut</th>
+        </tr></thead><tbody id="top10-body"></tbody></table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>TOUS LES JOUEURS</h3>
+          <div class="sp"></div>
+          <input class="search-input" id="search-input" placeholder="Chercher un ID..." oninput="filterUsers()">
+        </div>
+        <table><thead><tr>
+          <th>ID Discord</th><th>Balance</th><th>V</th><th>D</th><th>Parties</th><th>Streak</th><th>JK</th><th>Statut</th><th>Actions</th>
+        </tr></thead><tbody id="users-body"></tbody></table>
+      </div>
+    </div>
+
+    <!-- FEED -->
+    <div class="page" id="page-feed">
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>ACTIVITÉ EN DIRECT</h3>
+          <div class="sp"></div>
+          <button class="refresh-btn" onclick="renderFeed()">Vider</button>
+        </div>
+        <div style="padding:16px">
+          <div id="feed-list"><div style="text-align:center;color:#2a2a2a;padding:40px">En attente d'activité...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NUKE -->
+    <div class="page" id="page-nuke">
+      <div style="max-width:680px;margin:0 auto">
+        <div id="nuke-zone">
+          <span class="nuke-icon">☢️</span>
+          <h2>ZONE NUKE</h2>
+          <p>Cette action va supprimer <strong style="color:#e53935">TOUTES</strong> les données :
+          balances, stats, historique, bans.<br>Irréversible. Tout le monde repart de zéro.</p>
+          <div class="nuke-warning">
+            ⚠️ <strong>CETTE ACTION :</strong><br>
+            — Remet toutes les balances à 0<br>
+            — Supprime toutes les statistiques<br>
+            — Retire tous les bans<br>
+            — Notifie tous les clients connectés en temps réel<br>
+            — <strong>NE PEUT PAS ÊTRE ANNULÉE</strong>
+          </div>
+          <input class="nuke-confirm-input" id="nuke-input"
+            placeholder="Tape PTIBLOND_NUKE pour confirmer"
+            oninput="document.getElementById('nuke-exec-btn').disabled=this.value!=='PTIBLOND_NUKE'">
+          <br><br>
+          <button class="nuke-btn" id="nuke-exec-btn" onclick="doNuke()" disabled>
+            💥 LANCER LE NUKE
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h2 id="modal-title">Action</h2>
+    <p id="modal-desc">Description</p>
+    <input id="modal-input" type="number" placeholder="Montant" min="0">
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal()">Annuler</button>
+      <button class="mbtn confirm" id="modal-confirm-btn" onclick="confirmModal()">Confirmer</button>
+    </div>
+  </div>
+</div>
+<div id="admin-toast"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+var ADMIN_PWD = '';
+var allUsers = [];
+var feedItems = [];
+
+// ── AUTH ──
+function doLogin(){
+  var pwd = document.getElementById('pwd-input').value;
+  fetch('/api/admin/stats', { headers: { 'x-admin-password': pwd } })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.error){ document.getElementById('login-err').textContent = '❌ Mot de passe incorrect'; return; }
+      ADMIN_PWD = pwd;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      loadAll();
+      startSocket();
+    }).catch(function(){ document.getElementById('login-err').textContent = '❌ Serveur indisponible'; });
+}
+function doLogout(){ ADMIN_PWD=''; location.reload(); }
+function api(url, opts){ return fetch(url, Object.assign({ headers: { 'x-admin-password': ADMIN_PWD, 'Content-Type':'application/json' } }, opts)).then(function(r){ return r.json(); }); }
+
+// ── TOAST ──
+function toast(msg, err){
+  var t = document.getElementById('admin-toast');
+  t.textContent = msg; t.className = 'show' + (err?' error':'');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.className=''; }, 2800);
+}
+
+// ── NAV ──
+function showPage(name){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  var titles = { dashboard:'DASHBOARD', users:'JOUEURS', feed:'FLUX LIVE', nuke:'ZONE NUKE' };
+  document.getElementById('page-title').textContent = titles[name] || name.toUpperCase();
+}
+
+// ── LOAD ALL ──
+function loadAll(){
+  loadStats();
+  loadUsers();
+}
+
+function loadStats(){
+  api('/api/admin/stats').then(function(d){
+    if(d.error) return;
+    document.getElementById('s-players').textContent = d.totalPlayers;
+    document.getElementById('s-money').textContent = d.totalMoney.toLocaleString('fr-FR');
+    document.getElementById('s-games').textContent = d.totalGames;
+    document.getElementById('s-jackpots').textContent = d.totalJackpots;
+    document.getElementById('s-banned').textContent = d.bannedCount;
+    document.getElementById('s-richest').textContent = d.richest.toLocaleString('fr-FR');
+  });
+}
+
+function loadUsers(){
+  api('/api/admin/users').then(function(users){
+    if(!Array.isArray(users)) return;
+    allUsers = users;
+    renderTop10();
+    renderUsers(users);
+  });
+}
+
+function renderTop10(){
+  var tbody = document.getElementById('top10-body');
+  var medals = ['🥇','🥈','🥉'];
+  tbody.innerHTML = allUsers.slice(0,10).map(function(u, i){
+    return '<tr class="'+(u.banned?'banned-row':'')+'">'
+      + '<td>'+(medals[i]||('#'+(i+1)))+'</td>'
+      + '<td class="td-id">'+u.id+'</td>'
+      + '<td class="td-bal">'+u.money.toLocaleString('fr-FR')+' cr.</td>'
+      + '<td class="td-wins">'+u.wins+'</td>'
+      + '<td class="td-losses">'+u.losses+'</td>'
+      + '<td class="td-games">'+u.games+'</td>'
+      + '<td class="td-jk">'+u.jackpots+'</td>'
+      + '<td>'+(u.banned?'<span class="banned-tag">BANNI</span>':'<span class="online-tag">ACTIF</span>')+'</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function renderUsers(users){
+  var tbody = document.getElementById('users-body');
+  tbody.innerHTML = users.map(function(u){
+    return '<tr class="'+(u.banned?'banned-row':'')+'">'
+      + '<td class="td-id">'+u.id+'</td>'
+      + '<td class="td-bal">'+u.money.toLocaleString('fr-FR')+'</td>'
+      + '<td class="td-wins">'+u.wins+'</td>'
+      + '<td class="td-losses">'+u.losses+'</td>'
+      + '<td class="td-games">'+u.games+'</td>'
+      + '<td class="td-ws">'+u.winstreak+'</td>'
+      + '<td class="td-jk">'+u.jackpots+'</td>'
+      + '<td>'+(u.banned?'<span class="banned-tag">BANNI</span>':'<span class="online-tag">ACTIF</span>')+'</td>'
+      + '<td><div class="act-group">'
+        + '<button class="abtn add" onclick="openModal(\'add\',\''+u.id+'\')">+cr</button>'
+        + '<button class="abtn remove" onclick="openModal(\'remove\',\''+u.id+'\')">-cr</button>'
+        + '<button class="abtn set" onclick="openModal(\'set\',\''+u.id+'\')">Set</button>'
+        + '<button class="abtn reset" onclick="resetUser(\''+u.id+'\')">Reset</button>'
+        + (u.banned
+          ? '<button class="abtn unban" onclick="banUser(\''+u.id+'\',\'unban\')">Débannir</button>'
+          : '<button class="abtn ban" onclick="banUser(\''+u.id+'\',\'ban\')">Bannir</button>')
+        + '</div></td>'
+      + '</tr>';
+  }).join('');
+}
+
+function filterUsers(){
+  var q = document.getElementById('search-input').value.toLowerCase();
+  var filtered = allUsers.filter(function(u){ return u.id.toLowerCase().includes(q); });
+  renderUsers(filtered);
+}
+
+// ── MODAL ──
+var modalAction = '', modalUserId = '';
+function openModal(action, userId){
+  modalAction = action; modalUserId = userId;
+  var labels = { add:'Ajouter des crédits', remove:'Retirer des crédits', set:'Définir la balance' };
+  document.getElementById('modal-title').textContent = labels[action] || action;
+  document.getElementById('modal-desc').textContent = 'Joueur : ' + userId;
+  document.getElementById('modal-input').value = '';
+  document.getElementById('modal-overlay').classList.add('show');
+  setTimeout(function(){ document.getElementById('modal-input').focus(); }, 100);
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('show'); }
+function confirmModal(){
+  var amount = parseInt(document.getElementById('modal-input').value, 10);
+  if(isNaN(amount) || amount < 0){ toast('Montant invalide', true); return; }
+  api('/api/admin/balance', { method:'POST', body: JSON.stringify({ userId: modalUserId, amount: amount, action: modalAction }) })
+    .then(function(d){
+      if(d.error){ toast(d.error, true); return; }
+      toast('✅ Balance mise à jour : ' + d.newBalance.toLocaleString('fr-FR') + ' cr.');
+      closeModal(); loadUsers();
+    });
+}
+
+// ── BAN ──
+function banUser(userId, action){
+  var label = action === 'ban' ? 'Bannir' : 'Débannir';
+  if(!confirm(label + ' le joueur ' + userId + ' ?')) return;
+  api('/api/admin/ban', { method:'POST', body: JSON.stringify({ userId: userId, action: action }) })
+    .then(function(d){
+      if(d.error){ toast(d.error, true); return; }
+      toast(action==='ban' ? '🚫 Joueur banni' : '✅ Joueur débanni');
+      loadUsers();
+    });
+}
+
+// ── RESET ──
+function resetUser(userId){
+  if(!confirm('Réinitialiser ' + userId + ' ? (Balance → 1000, stats à 0)')) return;
+  api('/api/admin/reset', { method:'POST', body: JSON.stringify({ userId: userId }) })
+    .then(function(d){
+      if(d.error){ toast(d.error, true); return; }
+      toast('🔄 Joueur réinitialisé');
+      loadUsers();
+    });
+}
+
+// ── NUKE ──
+function doNuke(){
+  if(!confirm('⚠️ DERNIÈRE CHANCE — Vraiment tout détruire ?')) return;
+  api('/api/admin/nuke', { method:'POST', body: JSON.stringify({ confirm: 'PTIBLOND_NUKE' }) })
+    .then(function(d){
+      if(d.error){ toast(d.error, true); return; }
+      toast('💥 NUKE EFFECTUÉ — Toutes les données sont détruites', true);
+      document.getElementById('nuke-input').value = '';
+      document.getElementById('nuke-exec-btn').disabled = true;
+      loadAll();
+    });
+}
+
+// ── LIVE FEED ──
+function addFeedItem(ev){
+  var icons = { roulette:'🎡', slots_spin:'🎰', slots_jackpot:'💰', blackjack:'🃏', duel_end:'⚔️', blackjack_web:'🃏' };
+  var icon = icons[ev.type] || '🎮';
+  var now = new Date().toLocaleTimeString('fr-FR');
+  var win = ev.win || (ev.gain && ev.gain > 0);
+  feedItems.unshift({ icon:icon, ev:ev, time:now, win:win });
+  if(feedItems.length > 60) feedItems.pop();
+  if(document.getElementById('page-feed').classList.contains('active')) renderFeed();
+}
+function renderFeed(){
+  var el = document.getElementById('feed-list');
+  if(!feedItems.length){ el.innerHTML='<div style="text-align:center;color:#2a2a2a;padding:40px">En attente d\'activité...</div>'; return; }
+  el.innerHTML = feedItems.map(function(f){
+    var cls = f.ev.type==='slots_jackpot'?'jackpot':f.win?'win':'lose';
+    var gain = f.ev.gain ? (f.ev.gain>0?'<span class="feed-gain pos">+'+f.ev.gain+'</span>':'<span class="feed-gain neg">'+f.ev.gain+'</span>') : '';
+    return '<div class="feed-item '+cls+'">'
+      + '<span class="feed-ico">'+f.icon+'</span>'
+      + '<div class="feed-txt"><strong>'+(f.ev.player||'?')+'</strong> — '+f.ev.type.replace(/_/g,' ')+(f.ev.number!==undefined?' n°'+f.ev.number:'')+'</div>'
+      + gain
+      + '<div class="feed-time">'+f.time+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+// ── SOCKET.IO ──
+function startSocket(){
+  var s; try{ s = io(); }catch(e){ return; }
+  s.on('live_event', function(ev){ addFeedItem(ev); });
+  s.on('economy_update', function(){ loadStats(); });
+  s.on('nuke', function(){ toast('💥 NUKE reçu — données effacées', true); loadAll(); });
+  s.on('ban_update', function(){ loadUsers(); });
+  s.on('discord_status', function(d){
+    document.getElementById('bot-status-txt').textContent = d.online ? ('Discord: '+d.tag) : 'Bot offline';
+  });
+  s.on('bot_ready', function(d){
+    document.getElementById('bot-status-txt').textContent = d.tag || 'Bot en ligne';
+  });
+}
+
+// ── INIT ──
+document.getElementById('pwd-input').focus();
+</script>
+</body>
+</html>
