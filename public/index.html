@@ -483,8 +483,9 @@ function tickJackpot() {
 }
 tickJackpot();
 
-// Balance display
-var playerBal = 1000;
+// Balance display — lit depuis localStorage
+var _pl = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
+var playerBal = _pl.balance || 1000;
 function updateBal() {
   document.getElementById('bal-val').textContent = playerBal.toLocaleString('fr-FR');
 }
@@ -492,8 +493,12 @@ updateBal();
 
 function enterCasino() {
   var p = document.getElementById('pseudo-input').value.trim();
-  if (!p) { p = 'Joueur'; }
-  document.getElementById('bal-val').textContent = playerBal.toLocaleString('fr-FR');
+  if (p) {
+    var saved = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
+    saved.name = p;
+    localStorage.setItem('casino_player', JSON.stringify(saved));
+  }
+  window.location.href = 'blackjack.html';
 }
 
 // Try socket.io silently
@@ -503,6 +508,15 @@ try {
     socket.on('balance', function(data) {
       if (data && data.balance !== undefined) {
         playerBal = data.balance;
+        updateBal();
+      }
+    });
+    socket.on('admin_balance_update', function(data) {
+      if (data && data.newBalance !== undefined) {
+        playerBal = data.newBalance;
+        var saved = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
+        saved.balance = data.newBalance;
+        localStorage.setItem('casino_player', JSON.stringify(saved));
         updateBal();
       }
     });
