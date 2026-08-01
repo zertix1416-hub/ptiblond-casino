@@ -504,15 +504,11 @@ function tickJackpot() {
 }
 tickJackpot();
 
-// Balance display — IDENTIQUE à blackjack/roulette
-var _plData = JSON.parse(localStorage.getItem('casino_player') || '{"name":"Joueur","balance":1000}');
-if (!_plData.balance || _plData.balance === 0) {
-  _plData.balance = 1000;
-  localStorage.setItem('casino_player', JSON.stringify(_plData));
-}
-var playerBal = _plData.balance;
+// Balance display — relit le localStorage à chaque fois
 function updateBal() {
-  document.getElementById('bal-val').textContent = playerBal.toLocaleString('fr-FR');
+  var pl = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
+  var bal = pl.balance || 1000;
+  document.getElementById('bal-val').textContent = bal.toLocaleString('fr-FR');
 }
 updateBal();
 
