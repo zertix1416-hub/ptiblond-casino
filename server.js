@@ -3,6 +3,8 @@ const http     = require("http");
 const { Server } = require("socket.io");
 const path     = require("path");
 const fs       = require("fs");
+// Node 18+ a fetch natif, sinon on utilise node-fetch
+const fetch = globalThis.fetch || require("node-fetch");
 
 const app    = express();
 const server = http.createServer(app);
@@ -36,6 +38,87 @@ function saveJSON(file, data) {
         fs.writeFileSync(renderPath, JSON.stringify(data, null, 2));
     } catch {}
 }
+
+// ═══════════════════════════════════════
+//  DISCORD OAUTH
+// ═══════════════════════════════════════
+const DISCORD_CLIENT_ID     = "1532770688451219547";
+const DISCORD_CLIENT_SECRET = "z-AFoDautOT_SWlK8WhR7yBPWalsokhy";
+const DISCORD_REDIRECT      = process.env.DISCORD_REDIRECT || "https://ptiblond-casino.onrender.com/auth/callback";
+const sessions = {}; // token → { id, username, avatar, discriminator }
+
+// Step 1 — redirige vers Discord
+app.get("/auth/discord", (_req, res) => {
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT)}&response_type=code&scope=identify`;
+    res.redirect(url);
+});
+
+// Step 2 — Discord revient ici avec le code
+app.get("/auth/callback", async (req, res) => {
+    const code = req.query.code;
+    if (!code) return res.redirect("/?error=no_code");
+    try {
+        // Échange le code contre un token
+        const tokenRes = await fetch("https://discord.com/api/oauth2/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                client_id:     DISCORD_CLIENT_ID,
+                client_secret: DISCORD_CLIENT_SECRET,
+                grant_type:    "authorization_code",
+                code,
+                redirect_uri:  DISCORD_REDIRECT
+            })
+        });
+        const tokenData = await tokenRes.json();
+        if (!tokenData.access_token) return res.redirect("/?error=token_fail");
+
+        // Récupère l'utilisateur
+        const userRes = await fetch("https://discord.com/api/users/@me", {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` }
+        });
+        const user = await userRes.json();
+
+        // Crée la session
+        const sessionToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        sessions[sessionToken] = {
+            id:            user.id,
+            username:      user.username,
+            discriminator: user.discriminator || "0",
+            avatar:        user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/0.png`
+        };
+
+        // Crée le joueur dans economy.json si pas existant
+        const eco = loadJSON("./economy.json");
+        if (!eco[user.id]) {
+            eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
+            saveJSON("./economy.json", eco);
+        }
+
+        // Redirige vers l'index avec le token en cookie via URL
+        res.redirect(`/?session=${sessionToken}`);
+    } catch (e) {
+        console.error("OAuth error:", e);
+        res.redirect("/?error=oauth_fail");
+    }
+});
+
+// Récupère l'utilisateur connecté
+app.get("/auth/me", (req, res) => {
+    const token = req.query.token || req.headers["x-session-token"];
+    if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
+    const user = sessions[token];
+    const eco = loadJSON("./economy.json");
+    const playerData = eco[user.id] || { money: 1000 };
+    res.json({ ...user, balance: playerData.money, stats: playerData });
+});
+
+// Déconnexion
+app.get("/auth/logout", (req, res) => {
+    const token = req.query.token;
+    if (token) delete sessions[token];
+    res.redirect("/");
+});
 
 // ═══════════════════════════════════════
 //  STATIC FILES

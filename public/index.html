@@ -284,8 +284,29 @@ html, body {
     <div id="logo">&#9824; PTIBLOND CASINO</div>
     <div id="topbar-right">
       <div id="balance-top">&#128176; <span id="bal-val">1 000</span> cr.</div>
-      <input id="pseudo-input" type="text" placeholder="Votre pseudo..." maxlength="16"/>
-      <button id="btn-enter" onclick="enterCasino()">ENTRER</button>
+      <div id="user-area">
+        <button id="btn-discord" onclick="window.location.href='/auth/discord'"
+          style="background:linear-gradient(135deg,#5865F2,#4752c4);color:#fff;border:none;
+          border-radius:20px;padding:9px 20px;font-weight:700;font-size:12px;cursor:pointer;
+          display:flex;align-items:center;gap:8px;letter-spacing:1px;
+          box-shadow:0 4px 16px rgba(88,101,242,.4);transition:.2s">
+          <svg width="18" height="14" viewBox="0 0 71 55" fill="white">
+            <path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.2 0A38.9 38.9 0 0 0 25.5.9 58.4 58.4 0 0 0 10.8 5C1.6 18.9-.9 32.4.3 45.7a58.9 58.9 0 0 0 18 9.1 42.4 42.4 0 0 0 3.7-6 38.3 38.3 0 0 1-5.8-2.8l1.4-1.1a42 42 0 0 0 36 0l1.4 1.1a38.4 38.4 0 0 1-5.9 2.8 42.2 42.2 0 0 0 3.7 6 58.7 58.7 0 0 0 18-9 54.1 54.1 0 0 0-9.6-40.8zM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.3 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1zm23.5 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.3 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1z"/>
+          </svg>
+          SE CONNECTER DISCORD
+        </button>
+        <div id="user-info" style="display:none;align-items:center;gap:10px">
+          <img id="user-avatar" src="" style="width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,215,0,.4)">
+          <span id="user-name" style="font-family:'Cinzel',serif;font-size:12px;color:#FFD700;letter-spacing:1px"></span>
+          <button onclick="doLogout()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:5px 12px;color:#666;cursor:pointer;font-size:11px">&#x1F6AA;</button>
+        </div>
+      </div>
+      <button id="btn-enter" onclick="enterCasino()"
+        style="background:linear-gradient(135deg,#7a5a10,#FFD700,#7a5a10);color:#000;border:none;
+        border-radius:20px;padding:9px 20px;font-weight:700;font-size:12px;cursor:pointer;
+        letter-spacing:1px;font-family:'Cinzel',serif;transition:.2s">
+        JOUER &#9824;
+      </button>
     </div>
   </div>
 
@@ -496,12 +517,56 @@ function updateBal() {
 updateBal();
 
 function enterCasino() {
-  var p = document.getElementById('pseudo-input').value.trim();
   var saved = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
-  if (p) saved.name = p;
   localStorage.setItem('casino_player', JSON.stringify(saved));
   window.location.href = 'blackjack.html';
 }
+
+// ── DISCORD AUTH ──
+var SESSION_TOKEN = localStorage.getItem('discord_session') || '';
+
+function checkSession() {
+  // Récupère token depuis URL si callback Discord
+  var urlParams = new URLSearchParams(window.location.search);
+  var sessionFromUrl = urlParams.get('session');
+  if (sessionFromUrl) {
+    SESSION_TOKEN = sessionFromUrl;
+    localStorage.setItem('discord_session', SESSION_TOKEN);
+    window.history.replaceState({}, '', '/');
+  }
+  if (!SESSION_TOKEN) return;
+
+  // Vérifie la session auprès du serveur
+  fetch('/auth/me?token=' + SESSION_TOKEN)
+    .then(function(r) { return r.json(); })
+    .then(function(user) {
+      if (user.error) { localStorage.removeItem('discord_session'); SESSION_TOKEN = ''; return; }
+      // Met à jour le localStorage avec les infos Discord
+      var pl = { name: user.username, balance: user.balance, discordId: user.id, avatar: user.avatar };
+      localStorage.setItem('casino_player', JSON.stringify(pl));
+      playerBal = user.balance;
+      updateBal();
+      // Affiche l'interface connectée
+      document.getElementById('btn-discord').style.display = 'none';
+      document.getElementById('user-info').style.display = 'flex';
+      document.getElementById('user-avatar').src = user.avatar;
+      document.getElementById('user-name').textContent = user.username;
+    })
+    .catch(function() {});
+}
+
+function doLogout() {
+  fetch('/auth/logout?token=' + SESSION_TOKEN);
+  localStorage.removeItem('discord_session');
+  localStorage.removeItem('casino_player');
+  SESSION_TOKEN = '';
+  document.getElementById('btn-discord').style.display = 'flex';
+  document.getElementById('user-info').style.display = 'none';
+  document.getElementById('bal-val').textContent = '1 000';
+}
+
+// Vérifie la session au chargement
+checkSession();
 
 // Try socket.io silently
 try {
