@@ -328,7 +328,19 @@ canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 
 <script>
 var pl=JSON.parse(localStorage.getItem('casino_player')||'{"name":"Joueur","balance":1000}');
-function savePl(){pl.balance=balance;localStorage.setItem('casino_player',JSON.stringify(pl));}
+function savePl(){
+  pl.balance = balance;
+  localStorage.setItem('casino_player', JSON.stringify(pl));
+  // Sync vers MongoDB si connecté Discord
+  var token = localStorage.getItem('discord_session');
+  if(token){
+    fetch('/api/save-balance', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-session-token':token},
+      body:JSON.stringify({balance:balance})
+    }).catch(function(){});
+  }
+}
 function fmt(n){return Number(n).toLocaleString('fr-FR');}
 function syncUI(){
   document.getElementById('h-bal').textContent=fmt(balance);

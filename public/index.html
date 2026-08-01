@@ -537,11 +537,30 @@ function checkSession() {
     .then(function(r) { return r.json(); })
     .then(function(user) {
       if (user.error) { localStorage.removeItem('discord_session'); SESSION_TOKEN = ''; return; }
-      // Met à jour le localStorage avec les infos Discord
-      var pl = { name: user.username, balance: user.balance, discordId: user.id, avatar: user.avatar };
+
+      // Récupère la balance locale
+      var localPl = JSON.parse(localStorage.getItem('casino_player') || '{"balance":1000}');
+      var localBal = localPl.balance || 1000;
+      var serverBal = user.balance || 1000;
+
+      // Prend la balance la plus haute (local gagne si plus récente)
+      var finalBal = Math.max(localBal, serverBal);
+
+      // Met à jour le localStorage
+      var pl = { name: user.username, balance: finalBal, discordId: user.id, avatar: user.avatar };
       localStorage.setItem('casino_player', JSON.stringify(pl));
-      playerBal = user.balance;
+      playerBal = finalBal;
       updateBal();
+
+      // Si balance locale > serveur, on sync vers MongoDB
+      if (localBal > serverBal) {
+        fetch('/api/save-balance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-session-token': SESSION_TOKEN },
+          body: JSON.stringify({ balance: finalBal })
+        }).catch(function(){});
+      }
+
       // Affiche l'interface connectée
       document.getElementById('btn-discord').style.display = 'none';
       document.getElementById('user-info').style.display = 'flex';
