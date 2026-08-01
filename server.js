@@ -19,10 +19,9 @@ global.io = io;
 //  HELPERS
 // ═══════════════════════════════════════
 function loadJSON(file) {
-    // Sur Render, les fichiers dans /tmp persistent pendant la session
-    const renderPath = file.replace('./', '/tmp/');
-    const paths = [file, renderPath];
-    for (const p of paths) {
+    const tmpPath = '/tmp/' + path.basename(file);
+    // Priorité : /tmp/ (persist sur Render), sinon le fichier local
+    for (const p of [tmpPath, file]) {
         if (fs.existsSync(p)) {
             try { return JSON.parse(fs.readFileSync(p, "utf8")); }
             catch { continue; }
@@ -31,12 +30,10 @@ function loadJSON(file) {
     return {};
 }
 function saveJSON(file, data) {
-    // Sauvegarde dans les deux endroits
-    try { fs.writeFileSync(file, JSON.stringify(data, null, 2)); } catch {}
-    try {
-        const renderPath = file.replace('./', '/tmp/');
-        fs.writeFileSync(renderPath, JSON.stringify(data, null, 2));
-    } catch {}
+    const str = JSON.stringify(data, null, 2);
+    // Sauvegarde dans /tmp (persist Render) ET local
+    try { fs.writeFileSync('/tmp/' + path.basename(file), str); } catch {}
+    try { fs.writeFileSync(file, str); } catch {}
 }
 
 // ═══════════════════════════════════════
@@ -91,7 +88,7 @@ app.get("/auth/callback", async (req, res) => {
         // Crée le joueur dans economy.json si pas existant
         const eco = loadJSON("./economy.json");
         if (!eco[user.id]) {
-            eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
+            eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0, initialized: true };
             saveJSON("./economy.json", eco);
         }
 
