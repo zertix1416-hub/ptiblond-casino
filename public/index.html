@@ -122,6 +122,7 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:var(--bg);font-fam
     <button class="nl"><span class="ico">&#127942;</span> Bonus</button>
     <button class="nl" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})"><span class="ico">&#127918;</span> Jeux</button>
     <button class="nl"><span class="ico">&#127381;</span> Jackpot</button>
+    <a href="https://kick.com/ptiblond" target="_blank" class="nl" style="text-decoration:none;background:rgba(83,252,31,.08);border:1px solid rgba(83,252,31,.2);color:rgba(83,252,31,.9)"><span class="ico">&#128247;</span> Stream</a>
   </div>
   <div id="nav-sp"></div>
   <div id="nav-right">
@@ -217,6 +218,63 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:var(--bg);font-fam
   </div>
 </section>
 
+<!-- STREAM SECTION -->
+<section id="stream" style="padding:80px 40px;border-top:1px solid rgba(255,255,255,.06)">
+  <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">
+    Mon <span style="color:#53fc1f">Stream</span>
+  </h2>
+  <div style="color:rgba(255,255,255,.35);font-size:.88rem;margin-bottom:40px">
+    Rejoins-moi en direct sur Kick
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:28px;max-width:1100px">
+
+    <!-- KICK EMBED -->
+    <div style="background:#111;border:1px solid rgba(83,252,31,.2);border-radius:12px;overflow:hidden;aspect-ratio:16/9;position:relative">
+      <iframe
+        src="https://player.kick.com/ptiblond"
+        style="width:100%;height:100%;border:none;position:absolute;inset:0"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- INFOS -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- STATUS CARD -->
+      <div id="stream-status-card" style="background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div id="live-dot" style="width:10px;height:10px;border-radius:50%;background:#555"></div>
+          <span id="live-label" style="font-size:.82rem;font-weight:700;color:#555;letter-spacing:1px;text-transform:uppercase">HORS LIGNE</span>
+        </div>
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px">PTIBLOND</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.4);margin-bottom:20px">Casino &bull; Slots &bull; Blackjack</div>
+        <a href="https://kick.com/ptiblond" target="_blank"
+          style="display:block;text-align:center;background:#53fc1f;color:#000;
+          border:none;border-radius:8px;padding:12px;font-weight:700;font-size:.88rem;
+          text-decoration:none;transition:.2s;letter-spacing:.5px"
+          onmouseover="this.style.background='#3fd914'"
+          onmouseout="this.style.background='#53fc1f'">
+          &#128247; Regarder sur Kick
+        </a>
+      </div>
+
+      <!-- CHAT EMBED -->
+      <div style="background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;flex:1;min-height:280px">
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:.78rem;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:1px">
+          CHAT EN DIRECT
+        </div>
+        <iframe
+          src="https://kick.com/ptiblond/chatroom"
+          style="width:100%;height:260px;border:none"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <div id="footer">
   <div class="fl">PTIBLOND<span>.</span></div>
@@ -246,7 +304,26 @@ fetch('/api/stats').then(function(r){return r.json();}).then(function(d){
   if(d.totalJackpots!==undefined) document.getElementById('s-jackpots').textContent=d.totalJackpots;
 }).catch(function(){});
 
-// Discord auth
+// Check Kick stream status
+(function(){
+  fetch('https://kick.com/api/v1/channels/ptiblond')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var dot=document.getElementById('live-dot');
+      var lbl=document.getElementById('live-label');
+      if(d&&d.livestream){
+        dot.style.background='#53fc1f';
+        dot.style.boxShadow='0 0 10px #53fc1f';
+        dot.style.animation='blink 1.5s infinite';
+        lbl.textContent='EN DIRECT';
+        lbl.style.color='#53fc1f';
+      } else {
+        dot.style.background='#555';
+        lbl.textContent='HORS LIGNE';
+        lbl.style.color='#555';
+      }
+    }).catch(function(){});
+})();
 var SESSION_TOKEN=localStorage.getItem('discord_session')||'';
 function checkSession(){
   var p=new URLSearchParams(window.location.search);
