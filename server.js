@@ -129,7 +129,6 @@ app.get("/auth/callback", async (req, res) => {
                 games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0
             });
         }
-
         // Redirige vers l'index avec le token en cookie via URL
         res.redirect(`/?session=${sessionToken}`);
     } catch (e) {
@@ -138,14 +137,18 @@ app.get("/auth/callback", async (req, res) => {
     }
 });
 
-// Récupère l'utilisateur connecté
+// Récupère l'utilisateur connecté — balance depuis economy.json (même que bot Discord)
 app.get("/auth/me", async (req, res) => {
     const token = req.query.token || req.headers["x-session-token"];
     if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
     const user = sessions[token];
-    const player = await getPlayer(user.id);
-    const balance = player ? player.money : 1000;
-    res.json({ ...user, balance, stats: player || {} });
+    // Lit economy.json — même source que le bot Discord
+    const eco = loadJSON("./economy.json");
+    if (!eco[user.id]) {
+        eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
+        saveJSON("./economy.json", eco);
+    }
+    res.json({ ...user, balance: eco[user.id].money, stats: eco[user.id] });
 });
 
 // Déconnexion
@@ -230,15 +233,19 @@ app.post("/api/sync-balance", (req, res) => {
     res.json({ ok: true, balance: eco[discordId].money });
 });
 
-// Sauvegarde balance depuis le web (après chaque partie)
-app.post("/api/save-balance", async (req, res) => {
+// Sauvegarde balance depuis le web — écrit dans economy.json comme le bot Discord
+app.post("/api/save-balance", (req, res) => {
     const { balance } = req.body;
     const token = req.headers["x-session-token"];
     if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
     const user = sessions[token];
     if (typeof balance !== "number" || balance < 0) return res.status(400).json({ error: "Balance invalide" });
-    await savePlayer(user.id, { money: Math.floor(balance) });
-    res.json({ ok: true, balance: Math.floor(balance) });
+    const eco = loadJSON("./economy.json");
+    if (!eco[user.id]) eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
+    eco[user.id].money = Math.floor(balance);
+    saveJSON("./economy.json", eco);
+    if (global.io) global.io.emit("economy_update", eco);
+    res.json({ ok: true, balance: eco[user.id].money });
 });
 app.get("/api/live-feed", (_req, res) => {
     res.json(global.liveFeed || []);
