@@ -495,9 +495,55 @@ client.on("messageCreate", async message => {
         return message.reply({ embeds: [premiumEmbed("🏆 CLASSEMENT ROYAL", text)] });
     }
 
+    // WORK
+    if (cmd === "!work") {
+        const cooldown = 3600000; // 1 heure
+        const last = workCooldown[message.author.id] || 0;
+        const remaining = cooldown - (Date.now() - last);
+        if (remaining > 0) {
+            const mins = Math.ceil(remaining / 60000);
+            return message.reply({ embeds: [premiumEmbed("⏳ TRAVAIL", `Tu es fatigué ! Reviens dans **${mins} minute${mins > 1 ? "s" : ""}**.`, "Red")] });
+        }
+        const jobs = [
+            { job: "dealer de casino", min: 80, max: 200 },
+            { job: "croupier VIP", min: 100, max: 250 },
+            { job: "garde du casino", min: 60, max: 150 },
+            { job: "comptable des mises", min: 120, max: 300 },
+            { job: "serveur au bar", min: 50, max: 120 },
+            { job: "videur à l'entrée", min: 70, max: 180 },
+            { job: "technicien machines à sous", min: 90, max: 220 }
+        ];
+        const chosen = jobs[Math.floor(Math.random() * jobs.length)];
+        const gain = Math.floor(Math.random() * (chosen.max - chosen.min + 1)) + chosen.min;
+        workCooldown[message.author.id] = Date.now();
+        addMoney(message.author.id, gain);
+        return message.reply({ embeds: [premiumEmbed("💼 TRAVAIL", `Tu as travaillé comme **${chosen.job}** et gagné **${gain} crédits** !\n\n💰 Balance : **${economy[message.author.id].money} crédits**\n\n⏳ Prochain travail dans **1 heure**`, "Green")] });
+    }
+
+    // DAILY
+    if (cmd === "!daily") {
+        const cooldown = 86400000; // 24 heures
+        if (!economy[message.author.id]) createUser(message.author.id);
+        const last = economy[message.author.id].lastDaily || 0;
+        const remaining = cooldown - (Date.now() - last);
+        if (remaining > 0) {
+            const hrs = Math.floor(remaining / 3600000);
+            const mins = Math.ceil((remaining % 3600000) / 60000);
+            return message.reply({ embeds: [premiumEmbed("⏳ DAILY", `Tu as déjà réclamé ta récompense !\nReviens dans **${hrs}h ${mins}min**.`, "Red")] });
+        }
+        const streak = (economy[message.author.id].dailyStreak || 0) + 1;
+        const base = 200;
+        const bonus = Math.min(streak - 1, 6) * 50; // +50 par jour consécutif, max +300
+        const gain = base + bonus;
+        economy[message.author.id].lastDaily = Date.now();
+        economy[message.author.id].dailyStreak = streak;
+        addMoney(message.author.id, gain);
+        return message.reply({ embeds: [premiumEmbed("🎁 RÉCOMPENSE QUOTIDIENNE", `Tu as réclamé ta récompense du jour !\n\n💰 Gain : **+${gain} crédits**${bonus > 0 ? ` (dont +${bonus} de streak bonus)` : ""}\n🔥 Streak : **${streak} jour${streak > 1 ? "s" : ""} consécutif${streak > 1 ? "s" : ""}**\n\n💎 Balance : **${economy[message.author.id].money} crédits**\n\n⏳ Prochain daily dans **24 heures**`, "Green")] });
+    }
+
     // HELP
     if (cmd === "!help") {
-        return message.reply({ embeds: [premiumEmbed("🎰 CASINO ROYALE V9", `⚔️ DUEL\n!duel @joueur mise | !accept\n\n🃏 BLACKJACK\n!bj create mise | !bj join | !bj start | !hit | !stand | !double\n\n🎰 CASINO\n!roulette mise couleur | !slots mise\n\n👑 PROFIL\n!profile | !rich\n\n🌐 SITE\n!web\n\n⚙️ ADMIN\n!addbalance | !removebalance | !setbalance`)] });
+        return message.reply({ embeds: [premiumEmbed("🎰 CASINO ROYALE V9", `⚔️ DUEL\n!duel @joueur mise | !accept\n\n🃏 BLACKJACK\n!bj create mise | !bj join | !bj start | !hit | !stand | !double\n\n🎰 CASINO\n!roulette mise couleur | !slots mise\n\n💼 GAINS\n!work — Travailler (cooldown 1h)\n!daily — Bonus quotidien (cooldown 24h)\n\n👑 PROFIL\n!profile | !rich\n\n🌐 SITE\n!web\n\n⚙️ ADMIN\n!addbalance | !removebalance | !setbalance`)] });
     }
 
     // WEB LINK
