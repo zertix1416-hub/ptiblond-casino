@@ -4,10 +4,45 @@ const {
     EmbedBuilder
 } = require("discord.js");
 const fs = require("fs");
+const { MongoClient } = require("mongodb");
 
 // ================= CONFIG =================
-const TOKEN = process.env.DISCORD_TOKEN || "TOKEN_ICI";
+const TOKEN = process.env.DISCORD_TOKEN || "MTUzMjc3MDY4ODQ1MTIxOTU0Nw.GfRxDD.67k-XKD6WwfNhCmdYUKXdp3tnSSasJlg1qcacA";
 const OWNER_ID = "866234808328519730";
+const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://zertix1416_db_user:VCe8Ua9hQJm08FGA@cluster0.l3wo0a1.mongodb.net/?appName=Cluster0";
+
+// ================= MONGODB =================
+let playersCol = null;
+(async () => {
+    try {
+        const client = new MongoClient(MONGO_URI);
+        await client.connect();
+        playersCol = client.db("casino").collection("players");
+        console.log("✅ Bot MongoDB connecté");
+    } catch(e) {
+        console.error("❌ Bot MongoDB erreur:", e.message);
+    }
+})();
+
+async function getEco(id) {
+    if (playersCol) {
+        const p = await playersCol.findOne({ _id: id });
+        if (p) return p;
+    }
+    // Fallback economy.json
+    const eco = loadJSON("./economy.json");
+    return eco[id] || null;
+}
+
+async function setEco(id, data) {
+    if (playersCol) {
+        await playersCol.updateOne({ _id: id }, { $set: data }, { upsert: true });
+    }
+    // Aussi dans economy.json pour le fallback
+    const eco = loadJSON("./economy.json");
+    eco[id] = { ...eco[id], ...data };
+    saveEconomy();
+}
 
 // ================= CLIENT =================
 const client = new Client({
@@ -42,11 +77,46 @@ scammers = loadJSON("./scammers.json");
 function saveEconomy() {
     fs.writeFileSync("./economy.json", JSON.stringify(economy, null, 2));
     if (global.io) global.io.emit("economy_update", economy);
+    // Sync vers MongoDB
+    if (playersCol) {
+        Object.entries(economy).forEach(([id, data]) => {
+            playersCol.updateOne(
+                { _id: id },
+                { $set: { ...data, _id: id } },
+                { upsert: true }
+            ).catch(() => {});
+        });
+    }
 }
 
 function saveScammers() {
     fs.writeFileSync("./scammers.json", JSON.stringify(scammers, null, 2));
 }
+
+// Sync depuis MongoDB au démarrage — charge les vraies balances
+async function syncFromMongo() {
+    if (!playersCol) return;
+    try {
+        const players = await playersCol.find({}).toArray();
+        players.forEach(p => {
+            economy[p._id] = {
+                money: p.money || 1000,
+                bank: p.bank || 0,
+                wins: p.wins || 0,
+                losses: p.losses || 0,
+                games: p.games || 0,
+                winstreak: p.winstreak || 0,
+                bestWinstreak: p.bestWinstreak || 0,
+                jackpots: p.jackpots || 0
+            };
+        });
+        fs.writeFileSync("./economy.json", JSON.stringify(economy, null, 2));
+        console.log("✅ " + players.length + " joueurs chargés depuis MongoDB");
+    } catch(e) {
+        console.error("Erreur sync MongoDB:", e.message);
+    }
+}
+setTimeout(syncFromMongo, 3000);
 
 // ================= USER =================
 function createUser(id) {
@@ -56,6 +126,9 @@ function createUser(id) {
             games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0
         };
         saveEconomy();
+        if (playersCol) {
+            playersCol.updateOne({ _id: id }, { $setOnInsert: { _id: id, ...economy[id] } }, { upsert: true }).catch(() => {});
+        }
     }
 }
 
@@ -63,6 +136,7 @@ function addMoney(id, amount) {
     createUser(id);
     economy[id].money += amount;
     saveEconomy();
+    if (playersCol) playersCol.updateOne({ _id: id }, { $set: { money: economy[id].money } }).catch(() => {});
 }
 
 function removeMoney(id, amount) {
@@ -70,6 +144,7 @@ function removeMoney(id, amount) {
     if (economy[id].money < amount) return false;
     economy[id].money -= amount;
     saveEconomy();
+    if (playersCol) playersCol.updateOne({ _id: id }, { $set: { money: economy[id].money } }).catch(() => {});
     return true;
 }
 
