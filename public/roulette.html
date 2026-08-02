@@ -265,7 +265,17 @@ function nc(n) { return n === 0 ? 'g' : isRed(n) ? 'r' : 'b'; }
 function nh(n) { return n === 0 ? '#006600' : isRed(n) ? '#cc0000' : '#111111'; }
 
 var player = JSON.parse(localStorage.getItem('casino_player') || '{"name":"Joueur","balance":1000}');
-function save() { localStorage.setItem('casino_player', JSON.stringify(player)); }
+function save() {
+  localStorage.setItem('casino_player', JSON.stringify(player));
+  var token = localStorage.getItem('discord_session');
+  if (token) {
+    fetch('/api/save-balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+      body: JSON.stringify({ balance: player.balance })
+    }).catch(function() {});
+  }
+}
 function fmt(n) { return n.toLocaleString('fr-FR'); }
 function syncUI() {
   document.getElementById('nav-bal').textContent = fmt(player.balance);
