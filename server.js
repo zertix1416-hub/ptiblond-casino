@@ -137,16 +137,15 @@ app.get("/auth/callback", async (req, res) => {
     }
 });
 
-// Récupère l'utilisateur connecté — balance depuis economy.json (même que bot Discord)
+// Récupère l'utilisateur connecté — balance depuis economy partagé avec le bot
 app.get("/auth/me", async (req, res) => {
     const token = req.query.token || req.headers["x-session-token"];
     if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
     const user = sessions[token];
-    // Lit economy.json — même source que le bot Discord
-    const eco = loadJSON("./economy.json");
+    const eco = getEconomy();
     if (!eco[user.id]) {
         eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
-        saveJSON("./economy.json", eco);
+        saveEconomyShared();
     }
     res.json({ ...user, balance: eco[user.id].money, stats: eco[user.id] });
 });
@@ -159,8 +158,27 @@ app.get("/auth/logout", (req, res) => {
 });
 
 // ═══════════════════════════════════════
-//  STATIC FILES
+//  SHARED ECONOMY depuis bot.js
 // ═══════════════════════════════════════
+// On importe l'economy du bot — même objet en mémoire
+let botModule = null;
+function getEconomy() {
+    if (!botModule) {
+        try { botModule = require("./bot.js"); } catch(e) {}
+    }
+    return botModule ? botModule.economy : {};
+}
+function saveEconomyShared() {
+    const eco = getEconomy();
+    try { require("fs").writeFileSync("./economy.json", JSON.stringify(eco, null, 2)); } catch(e) {}
+    if (global.io) global.io.emit("economy_update", eco);
+    // Sync MongoDB
+    if (playersCol) {
+        Object.entries(eco).forEach(([id, data]) => {
+            playersCol.updateOne({ _id: id }, { $set: { ...data, _id: id } }, { upsert: true }).catch(() => {});
+        });
+    }
+}
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
@@ -233,18 +251,17 @@ app.post("/api/sync-balance", (req, res) => {
     res.json({ ok: true, balance: eco[discordId].money });
 });
 
-// Sauvegarde balance depuis le web — écrit dans economy.json comme le bot Discord
+// Sauvegarde balance depuis le web — écrit dans economy partagé
 app.post("/api/save-balance", (req, res) => {
     const { balance } = req.body;
     const token = req.headers["x-session-token"];
     if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
     const user = sessions[token];
     if (typeof balance !== "number" || balance < 0) return res.status(400).json({ error: "Balance invalide" });
-    const eco = loadJSON("./economy.json");
+    const eco = getEconomy();
     if (!eco[user.id]) eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
     eco[user.id].money = Math.floor(balance);
-    saveJSON("./economy.json", eco);
-    if (global.io) global.io.emit("economy_update", eco);
+    saveEconomyShared();
     res.json({ ok: true, balance: eco[user.id].money });
 });
 app.get("/api/live-feed", (_req, res) => {
@@ -265,13 +282,12 @@ function adminAuth(req, res, next) {
 
 // Liste tous les joueurs
 app.get("/api/admin/users", adminAuth, async (_req, res) => {
-    const players = await getAllPlayers();
+    const eco = getEconomy();
     const banned = loadJSON("./banned.json");
-    const users = players.map(p => ({
-        id: p._id, username: p.username || p._id,
-        money: p.money || 0, wins: p.wins || 0, losses: p.losses || 0,
-        games: p.games || 0, winstreak: p.winstreak || 0,
-        jackpots: p.jackpots || 0, banned: !!banned[p._id]
+    const users = Object.entries(eco).map(([id, d]) => ({
+        id, money: d.money||0, wins: d.wins||0, losses: d.losses||0,
+        games: d.games||0, winstreak: d.winstreak||0, jackpots: d.jackpots||0,
+        banned: !!banned[id]
     })).sort((a, b) => b.money - a.money);
     res.json(users);
 });
@@ -279,19 +295,14 @@ app.get("/api/admin/users", adminAuth, async (_req, res) => {
 // Modifier la balance
 app.post("/api/admin/balance", adminAuth, async (req, res) => {
     const { userId, amount, action } = req.body;
-    let player = await getPlayer(userId);
-    if (!player) {
-        player = { _id: userId, money: 1000, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
-    }
-    let newMoney = player.money || 0;
-    if (action === "set")    newMoney = Math.max(0, Number(amount));
-    if (action === "add")    newMoney = Math.max(0, newMoney + Number(amount));
-    if (action === "remove") newMoney = Math.max(0, newMoney - Number(amount));
-    await savePlayer(userId, { money: newMoney });
-    if (global.io) {
-        global.io.emit("admin_balance_update", { userId, newBalance: newMoney });
-    }
-    res.json({ ok: true, newBalance: newMoney });
+    const eco = getEconomy();
+    if (!eco[userId]) eco[userId] = { money: 1000, bank:0, wins:0, losses:0, games:0, winstreak:0, bestWinstreak:0, jackpots:0 };
+    if (action === "set")    eco[userId].money = Math.max(0, Number(amount));
+    if (action === "add")    eco[userId].money = Math.max(0, eco[userId].money + Number(amount));
+    if (action === "remove") eco[userId].money = Math.max(0, eco[userId].money - Number(amount));
+    saveEconomyShared();
+    if (global.io) global.io.emit("admin_balance_update", { userId, newBalance: eco[userId].money });
+    res.json({ ok: true, newBalance: eco[userId].money });
 });
 
 // Bannir / débannir
@@ -307,7 +318,9 @@ app.post("/api/admin/ban", adminAuth, (req, res) => {
 // Reset un joueur
 app.post("/api/admin/reset", adminAuth, async (req, res) => {
     const { userId } = req.body;
-    await savePlayer(userId, { money: 1000, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 });
+    const eco = getEconomy();
+    eco[userId] = { money: 1000, bank:0, wins:0, losses:0, games:0, winstreak:0, bestWinstreak:0, jackpots:0 };
+    saveEconomyShared();
     res.json({ ok: true });
 });
 
@@ -315,25 +328,27 @@ app.post("/api/admin/reset", adminAuth, async (req, res) => {
 app.post("/api/admin/nuke", adminAuth, async (req, res) => {
     const { confirm } = req.body;
     if (confirm !== "PTIBLOND_NUKE") return res.status(400).json({ error: "Confirmation requise" });
-    if (playersCol) await playersCol.deleteMany({});
+    const eco = getEconomy();
+    Object.keys(eco).forEach(k => delete eco[k]);
+    saveEconomyShared();
     saveJSON("./banned.json", {});
-    if (global.io) { global.io.emit("nuke", { ts: Date.now() }); }
+    if (global.io) global.io.emit("nuke", { ts: Date.now() });
     res.json({ ok: true, message: "NUKE effectué 💥" });
 });
 
 // Stats globales admin
 app.get("/api/admin/stats", adminAuth, async (_req, res) => {
-    const players = await getAllPlayers();
+    const eco = getEconomy();
+    const players = Object.values(eco);
     const banned = loadJSON("./banned.json");
-    const totalMoney = players.reduce((a, p) => a + (p.money || 0), 0);
     res.json({
-        totalPlayers: players.length,
-        totalMoney,
-        totalGames:   players.reduce((a, p) => a + (p.games || 0), 0),
-        totalWins:    players.reduce((a, p) => a + (p.wins || 0), 0),
-        totalJackpots:players.reduce((a, p) => a + (p.jackpots || 0), 0),
-        bannedCount:  Object.keys(banned).length,
-        richest:      players.reduce((a, p) => Math.max(a, p.money || 0), 0)
+        totalPlayers:  players.length,
+        totalMoney:    players.reduce((a,p)=>a+(p.money||0),0),
+        totalGames:    players.reduce((a,p)=>a+(p.games||0),0),
+        totalWins:     players.reduce((a,p)=>a+(p.wins||0),0),
+        totalJackpots: players.reduce((a,p)=>a+(p.jackpots||0),0),
+        bannedCount:   Object.keys(banned).length,
+        richest:       players.reduce((a,p)=>Math.max(a,p.money||0),0)
     });
 });
 
