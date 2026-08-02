@@ -361,6 +361,73 @@ function pushLiveFeed(event) {
 global.pushLiveFeed = pushLiveFeed;
 
 // ═══════════════════════════════════════
+//  GIVEAWAY API
+// ═══════════════════════════════════════
+let giveaways = {};
+
+app.post("/api/giveaway/create", adminAuth, (req, res) => {
+    const { title, description, prize, duration, maxEntries } = req.body;
+    if (!title || !prize) return res.status(400).json({ error: "titre et prix requis" });
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    giveaways[id] = {
+        id, title, description: description||"", prize,
+        endsAt: Date.now() + (parseInt(duration)||3600)*1000,
+        maxEntries: parseInt(maxEntries)||0,
+        entries: [], winner: null, active: true, createdAt: Date.now()
+    };
+    if (global.io) global.io.emit("giveaway_new", giveaways[id]);
+    res.json({ ok: true, giveaway: giveaways[id] });
+});
+
+app.get("/api/giveaway/list", (_req, res) => {
+    const list = Object.values(giveaways)
+        .sort((a,b) => b.createdAt - a.createdAt)
+        .map(g => ({ ...g, entriesCount: g.entries.length,
+            timeLeft: Math.max(0, g.endsAt - Date.now()),
+            active: g.active && Date.now() < g.endsAt }));
+    res.json(list);
+});
+
+app.post("/api/giveaway/enter", (req, res) => {
+    const { giveawayId } = req.body;
+    const token = req.headers["x-session-token"];
+    if (!token || !sessions[token]) return res.status(401).json({ error: "Connecte-toi avec Discord" });
+    const user = sessions[token];
+    const g = giveaways[giveawayId];
+    if (!g) return res.status(404).json({ error: "Giveaway introuvable" });
+    if (!g.active || Date.now() > g.endsAt) return res.status(400).json({ error: "Giveaway termine" });
+    if (g.entries.find(e => e.id === user.id)) return res.status(400).json({ error: "Tu participes deja !" });
+    if (g.maxEntries > 0 && g.entries.length >= g.maxEntries) return res.status(400).json({ error: "Complet" });
+    g.entries.push({ id: user.id, username: user.username, avatar: user.avatar, enteredAt: Date.now() });
+    if (global.io) global.io.emit("giveaway_update", { id: giveawayId, entriesCount: g.entries.length });
+    res.json({ ok: true, entriesCount: g.entries.length });
+});
+
+app.post("/api/giveaway/draw", adminAuth, (req, res) => {
+    const { giveawayId } = req.body;
+    const g = giveaways[giveawayId];
+    if (!g) return res.status(404).json({ error: "Introuvable" });
+    if (!g.entries.length) return res.status(400).json({ error: "Aucun participant" });
+    const winner = g.entries[Math.floor(Math.random() * g.entries.length)];
+    g.winner = winner; g.active = false;
+    const prizeNum = parseInt(g.prize);
+    if (!isNaN(prizeNum) && prizeNum > 0) {
+        const eco = getEconomy();
+        if (!eco[winner.id]) eco[winner.id] = { money:1000, bank:0, wins:0, losses:0, games:0, winstreak:0, bestWinstreak:0, jackpots:0 };
+        eco[winner.id].money += prizeNum;
+        saveEconomyShared();
+    }
+    if (global.io) global.io.emit("giveaway_winner", { id: giveawayId, winner });
+    res.json({ ok: true, winner });
+});
+
+app.delete("/api/giveaway/:id", adminAuth, (_req, res) => {
+    delete giveaways[_req.params.id];
+    res.json({ ok: true });
+});
+
+
+// ═══════════════════════════════════════
 //  SOCKET.IO  — Web Client Events
 // ═══════════════════════════════════════
 io.on("connection", socket => {

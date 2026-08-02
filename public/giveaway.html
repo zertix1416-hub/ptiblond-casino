@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Giveaways — PTIBLOND Casino</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--yellow:#FFD700;--bg:#0a0a0a}
+html,body{width:100%;min-height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:#fff}
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;
+  padding:0 40px;height:60px;background:rgba(10,10,10,.96);
+  border-bottom:1px solid rgba(255,255,255,.06)}
+#nav-logo{font-size:1.1rem;font-weight:900;letter-spacing:1px;color:#fff;text-decoration:none}
+#nav-logo span{color:var(--yellow)}
+#nav-sp{flex:1}
+#nav-links{display:flex;gap:8px;margin-left:32px}
+.nl{background:none;border:none;color:rgba(255,255,255,.5);font-size:.82rem;font-weight:500;
+  cursor:pointer;padding:6px 12px;border-radius:8px;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:5px}
+.nl:hover,.nl.active{color:#fff;background:rgba(255,255,255,.06)}
+.nl.gw{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);color:rgba(255,215,0,.9)}
+#nav-right{display:flex;align-items:center;gap:10px}
+#nav-bal{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.6);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:6px 14px}
+#nav-bal span{color:var(--yellow)}
+#btn-co{background:var(--yellow);color:#000;border:none;border-radius:8px;
+  padding:8px 18px;font-weight:700;font-size:.8rem;cursor:pointer;transition:.15s}
+#btn-co:hover{background:#e6c200}
+#user-info{display:none;align-items:center;gap:8px}
+#user-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--yellow)}
+#user-name{font-size:.8rem;font-weight:600;color:var(--yellow)}
+#btn-out{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;padding:5px 10px;color:#777;cursor:pointer;font-size:.75rem}
+
+/* PAGE */
+#page{padding:90px 40px 60px;max-width:1100px;margin:0 auto}
+#page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
+#page-header h1{font-size:2rem;font-weight:900}
+#page-header h1 span{color:var(--yellow)}
+
+/* ADMIN CREATE PANEL */
+#admin-panel{background:#111;border:1px solid rgba(255,215,0,.2);border-radius:12px;
+  padding:28px;margin-bottom:40px;display:none}
+#admin-panel h2{font-size:1rem;font-weight:700;color:var(--yellow);
+  margin-bottom:20px;letter-spacing:.5px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-full{grid-column:1/-1}
+.inp{background:#0a0a0a;border:1px solid rgba(255,255,255,.1);border-radius:8px;
+  padding:10px 14px;color:#fff;font-size:.85rem;font-family:'Inter',sans-serif;
+  outline:none;width:100%;transition:.2s}
+.inp:focus{border-color:var(--yellow)}
+.inp::placeholder{color:#444}
+label{display:block;font-size:.72rem;color:rgba(255,255,255,.4);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+#btn-create{background:var(--yellow);color:#000;border:none;border-radius:8px;
+  padding:11px 24px;font-weight:700;font-size:.85rem;cursor:pointer;
+  transition:.2s;letter-spacing:.5px;margin-top:8px}
+#btn-create:hover{background:#e6c200;transform:translateY(-1px)}
+
+/* GIVEAWAY CARDS */
+#giveaway-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.gcard{background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;
+  padding:24px;position:relative;overflow:hidden;transition:.2s}
+.gcard.active-gw{border-color:rgba(255,215,0,.3)}
+.gcard.ended{opacity:.6}
+.gcard-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+  border-radius:20px;font-size:.68rem;font-weight:700;letter-spacing:.5px;margin-bottom:14px}
+.gcard-badge.live{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);color:var(--yellow)}
+.gcard-badge.live .dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:blink 1.5s infinite}
+.gcard-badge.ended-badge{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#555}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.gcard h3{font-size:1.1rem;font-weight:800;margin-bottom:6px}
+.gcard-desc{font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.6;margin-bottom:16px}
+.prize-box{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.15);
+  border-radius:8px;padding:10px 14px;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px}
+.prize-icon{font-size:1.3rem}
+.prize-txt{font-size:.88rem;font-weight:700;color:var(--yellow)}
+.prize-sub{font-size:.7rem;color:rgba(255,215,0,.5);margin-top:1px}
+.gcard-meta{display:flex;gap:16px;margin-bottom:18px}
+.meta-item{font-size:.75rem;color:#555}
+.meta-item strong{color:rgba(255,255,255,.7);display:block;font-size:.88rem}
+.timer{font-size:.85rem;font-weight:700;color:var(--yellow)}
+.btn-enter{width:100%;padding:12px;background:var(--yellow);color:#000;
+  border:none;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;
+  transition:.2s;letter-spacing:.5px}
+.btn-enter:hover{background:#e6c200;transform:translateY(-1px)}
+.btn-enter:disabled{background:#222;color:#555;cursor:not-allowed;transform:none}
+.btn-enter.entered{background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.3);color:#00e87a}
+.winner-box{background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);
+  border-radius:8px;padding:12px 16px;margin-top:14px;
+  display:flex;align-items:center;gap:10px}
+.winner-avatar{width:32px;height:32px;border-radius:50%;border:2px solid #00e87a}
+.winner-name{font-size:.85rem;font-weight:700;color:#00e87a}
+.winner-label{font-size:.68rem;color:rgba(0,232,122,.5);letter-spacing:1px;text-transform:uppercase}
+
+/* ADMIN CONTROLS ON CARD */
+.admin-actions{display:flex;gap:8px;margin-top:12px;border-top:1px solid rgba(255,255,255,.05);padding-top:12px}
+.abtn{flex:1;padding:8px;border:none;border-radius:6px;font-size:.75rem;
+  font-weight:600;cursor:pointer;transition:.2s}
+.abtn.draw{background:rgba(255,215,0,.12);color:var(--yellow);border:1px solid rgba(255,215,0,.2)}
+.abtn.draw:hover{background:rgba(255,215,0,.22)}
+.abtn.del{background:rgba(255,50,50,.1);color:#ff5555;border:1px solid rgba(255,50,50,.2)}
+.abtn.del:hover{background:rgba(255,50,50,.2)}
+
+#empty{text-align:center;padding:80px 20px;color:rgba(255,255,255,.2)}
+#empty .eicon{font-size:3.5rem;margin-bottom:16px;display:block;opacity:.4}
+#empty .etxt{font-size:1rem;font-weight:600}
+#empty .esub{font-size:.82rem;margin-top:8px}
+
+#toast{position:fixed;top:72px;right:20px;z-index:200;background:#1a1a1a;
+  border:1px solid rgba(255,255,255,.1);border-radius:10px;
+  padding:12px 20px;font-size:.85rem;color:#fff;
+  opacity:0;transition:.3s;pointer-events:none;max-width:280px}
+#toast.show{opacity:1}
+#toast.ok{border-color:rgba(255,215,0,.4);color:var(--yellow)}
+#toast.err{border-color:rgba(255,80,80,.4);color:#ff6666}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <a href="index.html" id="nav-logo">PTIBLOND<span>.</span></a>
+  <div id="nav-links">
+    <a href="index.html" class="nl">&#127968; Accueil</a>
+    <a href="blackjack.html" class="nl">&#127183; Blackjack</a>
+    <a href="roulette.html" class="nl">&#127921; Roulette</a>
+    <a href="slots.html" class="nl">&#127920; Slots</a>
+    <a href="giveaway.html" class="nl gw active">&#127873; Giveaway</a>
+  </div>
+  <div id="nav-sp"></div>
+  <div id="nav-right">
+    <div id="nav-bal">&#128176; <span id="bal-val">1 000</span> cr.</div>
+    <button id="btn-co" onclick="window.location.href='/auth/discord'">Connexion Discord</button>
+    <div id="user-info">
+      <img id="user-avatar" src="" alt="">
+      <span id="user-name"></span>
+      <button id="btn-out" onclick="doLogout()">Quitter</button>
+    </div>
+  </div>
+</nav>
+
+<div id="page">
+  <div id="page-header">
+    <h1>&#127873; Give<span>aways</span></h1>
+    <div id="admin-toggle" style="display:none">
+      <button onclick="toggleAdmin()" style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);
+        color:var(--yellow);border-radius:8px;padding:9px 18px;cursor:pointer;font-weight:600;font-size:.82rem">
+        + Creer un giveaway
+      </button>
+    </div>
+  </div>
+
+  <!-- ADMIN CREATE PANEL -->
+  <div id="admin-panel">
+    <h2>CREER UN GIVEAWAY</h2>
+    <div class="form-grid">
+      <div>
+        <label>Titre *</label>
+        <input class="inp" id="f-title" placeholder="Ex: 500 credits a gagner">
+      </div>
+      <div>
+        <label>Prix * (nombre = credits, texte = autre)</label>
+        <input class="inp" id="f-prize" placeholder="Ex: 500 ou Discord Nitro">
+      </div>
+      <div>
+        <label>Duree (en secondes)</label>
+        <input class="inp" id="f-duration" type="number" placeholder="3600 = 1h, 86400 = 24h" value="3600">
+      </div>
+      <div>
+        <label>Participants max (0 = illimite)</label>
+        <input class="inp" id="f-max" type="number" placeholder="0" value="0">
+      </div>
+      <div class="form-full">
+        <label>Description</label>
+        <input class="inp" id="f-desc" placeholder="Description du giveaway...">
+      </div>
+    </div>
+    <button id="btn-create" onclick="createGiveaway()">LANCER LE GIVEAWAY</button>
+  </div>
+
+  <!-- LIST -->
+  <div id="giveaway-list"></div>
+  <div id="empty" style="display:none">
+    <span class="eicon">&#127873;</span>
+    <div class="etxt">Aucun giveaway en cours</div>
+    <div class="esub">Reviens bientot !</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+var SESSION_TOKEN = localStorage.getItem('discord_session')||'';
+var IS_ADMIN = false;
+var ADMIN_PWD = localStorage.getItem('admin_pwd')||'';
+var giveaways = [];
+var myEntries = {};
+
+function toast(msg, type){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+(type||'ok');
+  clearTimeout(t._t); t._t=setTimeout(function(){t.className='';},2800);
+}
+
+function fmt(n){return Number(n).toLocaleString('fr-FR');}
+
+function updateBal(){
+  var pl=JSON.parse(localStorage.getItem('casino_player')||'{"balance":1000}');
+  document.getElementById('bal-val').textContent=fmt(pl.balance||1000);
+}
+updateBal();
+
+// ── AUTH ──
+function checkSession(){
+  var p=new URLSearchParams(window.location.search);
+  var t=p.get('session');
+  if(t){SESSION_TOKEN=t;localStorage.setItem('discord_session',t);window.history.replaceState({},'','/');}
+  if(!SESSION_TOKEN)return;
+  fetch('/auth/me?token='+SESSION_TOKEN)
+    .then(function(r){return r.json();})
+    .then(function(u){
+      if(u.error){localStorage.removeItem('discord_session');SESSION_TOKEN='';return;}
+      var pl={name:u.username,balance:u.balance,discordId:u.id,avatar:u.avatar};
+      localStorage.setItem('casino_player',JSON.stringify(pl));
+      updateBal();
+      document.getElementById('btn-co').style.display='none';
+      document.getElementById('user-info').style.display='flex';
+      document.getElementById('user-avatar').src=u.avatar;
+      document.getElementById('user-name').textContent=u.username;
+    }).catch(function(){});
+}
+checkSession();
+function doLogout(){
+  fetch('/auth/logout?token='+SESSION_TOKEN);
+  localStorage.removeItem('discord_session');localStorage.removeItem('casino_player');
+  SESSION_TOKEN='';
+  document.getElementById('btn-co').style.display='flex';
+  document.getElementById('user-info').style.display='none';
+  updateBal();
+}
+
+// ── ADMIN CHECK ──
+function checkAdmin(){
+  if(!ADMIN_PWD){
+    var pwd=prompt('Mot de passe admin:');
+    if(!pwd)return;
+    ADMIN_PWD=pwd;
+  }
+  fetch('/api/admin/stats?pwd='+ADMIN_PWD)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){ADMIN_PWD='';toast('Mot de passe incorrect','err');return;}
+      IS_ADMIN=true;
+      localStorage.setItem('admin_pwd',ADMIN_PWD);
+      document.getElementById('admin-toggle').style.display='flex';
+      loadGiveaways();
+      toast('Mode admin actif');
+    }).catch(function(){toast('Erreur serveur','err');});
+}
+
+// Bouton clic logo 5x = mode admin
+var logoClicks=0;
+document.getElementById('nav-logo').addEventListener('click',function(e){
+  logoClicks++;
+  if(logoClicks>=5){logoClicks=0;checkAdmin();}
+  setTimeout(function(){logoClicks=0;},3000);
+});
+// Si admin_pwd dans localStorage, on essaie auto
+if(ADMIN_PWD){
+  fetch('/api/admin/stats?pwd='+ADMIN_PWD)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d.error){IS_ADMIN=true;document.getElementById('admin-toggle').style.display='flex';}
+    }).catch(function(){});
+}
+
+function toggleAdmin(){
+  var p=document.getElementById('admin-panel');
+  p.style.display=p.style.display==='none'||!p.style.display?'block':'none';
+}
+
+// ── CREATE ──
+function createGiveaway(){
+  var title=document.getElementById('f-title').value.trim();
+  var prize=document.getElementById('f-prize').value.trim();
+  var duration=parseInt(document.getElementById('f-duration').value)||3600;
+  var max=parseInt(document.getElementById('f-max').value)||0;
+  var desc=document.getElementById('f-desc').value.trim();
+  if(!title||!prize){toast('Titre et prix requis','err');return;}
+  fetch('/api/giveaway/create',{method:'POST',
+    headers:{'Content-Type':'application/json','x-admin-password':ADMIN_PWD},
+    body:JSON.stringify({title,prize,duration,maxEntries:max,description:desc})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error){toast(d.error,'err');return;}
+    toast('Giveaway lance !');
+    document.getElementById('f-title').value='';
+    document.getElementById('f-prize').value='';
+    document.getElementById('f-desc').value='';
+    document.getElementById('admin-panel').style.display='none';
+    loadGiveaways();
+  }).catch(function(){toast('Erreur','err');});
+}
+
+// ── LOAD ──
+function loadGiveaways(){
+  fetch('/api/giveaway/list')
+    .then(function(r){return r.json();})
+    .then(function(list){
+      giveaways=list;
+      renderGiveaways();
+    }).catch(function(){});
+}
+
+// ── TIMERS ──
+var timerInterval=null;
+function startTimers(){
+  clearInterval(timerInterval);
+  timerInterval=setInterval(function(){
+    giveaways.forEach(function(g){
+      var el=document.getElementById('timer-'+g.id);
+      if(!el)return;
+      var left=Math.max(0,g.endsAt-Date.now());
+      if(left===0){el.textContent='Termine';return;}
+      var h=Math.floor(left/3600000);
+      var m=Math.floor((left%3600000)/60000);
+      var s=Math.floor((left%60000)/1000);
+      el.textContent=(h>0?h+'h ':'')+(m>0?m+'m ':'')+s+'s';
+    });
+  },1000);
+}
+
+// ── RENDER ──
+function renderGiveaways(){
+  var list=document.getElementById('giveaway-list');
+  var empty=document.getElementById('empty');
+  if(!giveaways.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  list.innerHTML=giveaways.map(function(g){
+    var isActive=g.active&&Date.now()<g.endsAt;
+    var entered=myEntries[g.id];
+    var prizeNum=parseInt(g.prize);
+    var prizeDisplay=!isNaN(prizeNum)?prizeNum.toLocaleString('fr-FR')+' credits':g.prize;
+
+    var winnerHtml='';
+    if(g.winner){
+      winnerHtml='<div class="winner-box">'
+        +'<img class="winner-avatar" src="'+g.winner.avatar+'" onerror="this.src=\'\'"/>'
+        +'<div><div class="winner-label">Gagnant</div>'
+        +'<div class="winner-name">'+g.winner.username+'</div></div>'
+        +'</div>';
+    }
+
+    var adminHtml='';
+    if(IS_ADMIN){
+      adminHtml='<div class="admin-actions">'
+        +(isActive?'<button class="abtn draw" onclick="drawGiveaway(\''+g.id+'\')">&#127922; Tirer au sort</button>':'')
+        +'<button class="abtn del" onclick="deleteGiveaway(\''+g.id+'\')">&#128465; Supprimer</button>'
+        +'</div>';
+    }
+
+    var btnTxt=!SESSION_TOKEN?'Connecte-toi pour participer':entered?'&#10003; Tu participes':isActive?'&#127873; Participer':'Termine';
+    var btnClass='btn-enter'+(entered?' entered':'')+(!isActive?' ':'')+(!SESSION_TOKEN?' ':' ');
+    var btnDisabled=!isActive||entered?'disabled':'';
+
+    return '<div class="gcard '+(isActive?'active-gw':'ended')+'" id="gcard-'+g.id+'">'
+      +'<div class="gcard-badge '+(isActive?'live':'ended-badge')+'">'
+      +(isActive?'<div class="dot"></div>':'')
+      +(isActive?'EN COURS':'TERMINE')
+      +'</div>'
+      +'<h3>'+g.title+'</h3>'
+      +(g.description?'<div class="gcard-desc">'+g.description+'</div>':'')
+      +'<div class="prize-box"><span class="prize-icon">&#127873;</span>'
+      +'<div><div class="prize-txt">'+prizeDisplay+'</div>'
+      +'<div class="prize-sub">Prix a gagner</div></div></div>'
+      +'<div class="gcard-meta">'
+      +'<div class="meta-item"><strong>'+g.entriesCount+'</strong>Participants</div>'
+      +(g.maxEntries?'<div class="meta-item"><strong>'+g.maxEntries+'</strong>Max</div>':'')
+      +(isActive?'<div class="meta-item"><strong class="timer" id="timer-'+g.id+'">...</strong>Temps restant</div>':'')
+      +'</div>'
+      +(isActive?'<button class="'+btnClass+'" '+btnDisabled+' onclick="enterGiveaway(\''+g.id+'\')">'+(entered?'&#10003; Tu participes':'&#127873; Participer')+'</button>':'')
+      +winnerHtml+adminHtml
+      +'</div>';
+  }).join('');
+  startTimers();
+}
+
+// ── ENTER ──
+function enterGiveaway(id){
+  if(!SESSION_TOKEN){window.location.href='/auth/discord';return;}
+  fetch('/api/giveaway/enter',{method:'POST',
+    headers:{'Content-Type':'application/json','x-session-token':SESSION_TOKEN},
+    body:JSON.stringify({giveawayId:id})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error){toast(d.error,'err');return;}
+    myEntries[id]=true;
+    toast('Tu participes ! Bonne chance &#127873;');
+    loadGiveaways();
+  }).catch(function(){toast('Erreur','err');});
+}
+
+// ── DRAW ──
+function drawGiveaway(id){
+  if(!confirm('Tirer au sort maintenant ?'))return;
+  fetch('/api/giveaway/draw',{method:'POST',
+    headers:{'Content-Type':'application/json','x-admin-password':ADMIN_PWD},
+    body:JSON.stringify({giveawayId:id})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error){toast(d.error,'err');return;}
+    toast('Gagnant : '+d.winner.username+' !');
+    loadGiveaways();
+  }).catch(function(){toast('Erreur','err');});
+}
+
+// ── DELETE ──
+function deleteGiveaway(id){
+  if(!confirm('Supprimer ce giveaway ?'))return;
+  fetch('/api/giveaway/'+id,{method:'DELETE',
+    headers:{'x-admin-password':ADMIN_PWD}
+  }).then(function(){toast('Supprime');loadGiveaways();})
+  .catch(function(){toast('Erreur','err');});
+}
+
+// ── SOCKET ──
+(function(){
+  var s;try{s=io();}catch(e){return;}
+  s.on('giveaway_new',function(){loadGiveaways();});
+  s.on('giveaway_update',function(){loadGiveaways();});
+  s.on('giveaway_winner',function(){loadGiveaways();});
+})();
+
+loadGiveaways();
+setInterval(loadGiveaways, 30000);
+</script>
+</body>
+</html>
