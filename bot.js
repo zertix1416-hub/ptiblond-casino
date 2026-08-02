@@ -483,16 +483,30 @@ client.on("messageCreate", async message => {
     }
 
     // LEADERBOARD
-    if (cmd === "!rich") {
-        let top = Object.entries(economy).sort((a, b) => b[1].money - a[1].money).slice(0, 10);
+    if (cmd === "!rich" || cmd === "!leaderboard" || cmd === "!lb") {
+        const medals = ["🥇", "🥈", "🥉"];
+        const top = Object.entries(economy)
+            .sort((a, b) => b[1].money - a[1].money)
+            .slice(0, 10);
+
         let text = "";
-        let i = 1;
-        for (let [id, data] of top) {
-            let user = await client.users.fetch(id).catch(() => null);
-            text += `${i}️⃣ ${user?.username || "Inconnu"} 💰 ${data.money}\n`;
+        let i = 0;
+        for (const [id, data] of top) {
+            const user = await client.users.fetch(id).catch(() => null);
+            const name = user?.username || "Inconnu";
+            const rank = medals[i] || `**${i + 1}.**`;
+            const wr = data.games > 0 ? Math.round((data.wins / data.games) * 100) : 0;
+            text += `${rank} **${name}**\n💰 ${data.money.toLocaleString("fr-FR")} cr. · 🏆 ${data.wins}V ${data.losses}D · 📊 ${wr}% WR\n\n`;
             i++;
         }
-        return message.reply({ embeds: [premiumEmbed("🏆 CLASSEMENT ROYAL", text)] });
+
+        return message.reply({
+            embeds: [premiumEmbed(
+                "🏆 CLASSEMENT PTIBLOND",
+                text || "Aucun joueur enregistré.",
+                "#FFD700"
+            )]
+        });
     }
 
     // WORK
