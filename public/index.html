@@ -4,350 +4,249 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>PTIBLOND Casino</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --gold:#d4a843;--gold2:#f0c040;--green:#00e87a;--red:#ff3355;
-  --bg:#05040d;--card-bg:rgba(12,10,28,.95)
-}
+:root{--yellow:#FFD700;--bg:#0a0a0a}
 html,body{width:100%;height:100%;overflow-x:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:#fff}
-canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-/* ── TOPBAR ── */
-#topbar{position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;padding:0 40px;height:66px;
-  background:linear-gradient(180deg,rgba(5,4,13,.98) 0%,rgba(5,4,13,.85) 100%);
-  border-bottom:1px solid rgba(212,168,67,.12);
-  backdrop-filter:blur(20px)}
-#logo-wrap{display:flex;align-items:center;gap:12px}
-#logo-icon{font-size:1.6rem;filter:drop-shadow(0 0 12px rgba(212,168,67,.6));animation:spin 8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#logo-text{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:4px;
-  background:linear-gradient(135deg,#ffe066,var(--gold),#b8860b);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#topbar-sp{flex:1}
-#top-right{display:flex;align-items:center;gap:12px}
-#bal-badge{display:flex;align-items:center;gap:8px;background:rgba(212,168,67,.08);
-  border:1px solid rgba(212,168,67,.2);border-radius:12px;padding:8px 16px}
-#bal-badge .icon{font-size:1.1rem}
-#bal-badge .txt{font-family:'Cinzel',serif;font-size:.8rem;color:var(--gold);font-weight:600;letter-spacing:1px}
-#btn-discord{display:flex;align-items:center;gap:8px;padding:9px 18px;border:none;border-radius:12px;
-  background:linear-gradient(135deg,#5865f2,#4752c4);color:#fff;font-weight:700;font-size:.78rem;
-  cursor:pointer;letter-spacing:1px;transition:.2s;box-shadow:0 4px 16px rgba(88,101,242,.35)}
-#btn-discord:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(88,101,242,.5)}
+/* ── NAVBAR ── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;padding:0 40px;height:60px;
+  background:rgba(10,10,10,.96);border-bottom:1px solid rgba(255,255,255,.06)}
+#nav-logo{font-size:1.15rem;font-weight:900;letter-spacing:1px;color:#fff;text-decoration:none}
+#nav-logo span{color:var(--yellow)}
+#nav-links{display:flex;align-items:center;gap:8px;margin-left:48px}
+.nl{background:none;border:none;color:rgba(255,255,255,.55);font-size:.82rem;
+  font-weight:500;cursor:pointer;padding:6px 12px;border-radius:8px;transition:.2s;
+  display:flex;align-items:center;gap:6px}
+.nl:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nl .ico{font-size:.85rem}
+#nav-sp{flex:1}
+#nav-right{display:flex;align-items:center;gap:12px}
+#btn-connect{background:var(--yellow);color:#000;border:none;border-radius:8px;
+  padding:8px 20px;font-weight:700;font-size:.82rem;cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:.15s;letter-spacing:.3px}
+#btn-connect:hover{background:#e6c200;transform:translateY(-1px)}
 #user-info{display:none;align-items:center;gap:10px}
-#user-avatar{width:34px;height:34px;border-radius:50%;border:2px solid rgba(212,168,67,.45)}
-#user-name{font-family:'Cinzel',serif;font-size:.82rem;color:var(--gold);letter-spacing:1px}
-#btn-logout{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  border-radius:8px;padding:6px 12px;color:#666;cursor:pointer;font-size:.75rem;transition:.2s}
-#btn-logout:hover{background:rgba(255,0,0,.1);color:#ff5555;border-color:rgba(255,0,0,.2)}
-#btn-play{padding:10px 22px;border:none;border-radius:12px;
-  background:linear-gradient(135deg,#8b6914,var(--gold),#8b6914);
-  color:#000;font-weight:700;font-size:.8rem;cursor:pointer;
-  letter-spacing:1.5px;font-family:'Cinzel',serif;transition:.2s}
-#btn-play:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,168,67,.4)}
+#user-avatar{width:30px;height:30px;border-radius:50%;border:2px solid var(--yellow)}
+#user-name{font-size:.82rem;font-weight:600;color:var(--yellow)}
+#btn-logout{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:6px 12px;color:#888;cursor:pointer;font-size:.78rem;transition:.2s}
+#btn-logout:hover{color:#fff}
+#nav-bal{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.7);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:6px 14px}
+#nav-bal span{color:var(--yellow)}
 
 /* ── HERO ── */
-#hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;padding:100px 20px 40px;text-align:center}
-#crown{font-size:4rem;margin-bottom:16px;display:block;
-  filter:drop-shadow(0 0 30px rgba(212,168,67,.7));
-  animation:crownFloat 4s ease-in-out infinite}
-@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-14px) rotate(3deg)}}
-#title{font-family:'Cinzel',serif;font-size:clamp(3.5rem,10vw,8rem);font-weight:900;
-  letter-spacing:10px;line-height:1;margin-bottom:16px;
-  background:linear-gradient(180deg,#fff8dc 0%,#ffd700 35%,#c8861a 65%,#8b6014 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 60px rgba(212,168,67,.3))}
-#subtitle{font-size:.8rem;letter-spacing:8px;color:rgba(212,168,67,.45);
-  text-transform:uppercase;margin-bottom:12px;font-family:'Cinzel',serif}
-#sep{width:200px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,168,67,.5),transparent);
-  margin:0 auto 48px}
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:100px 40px 80px;max-width:860px}
+#hero-badge{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;padding:6px 14px;font-size:.75rem;color:rgba(255,255,255,.6);
+  margin-bottom:28px;width:fit-content}
+#hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);
+  box-shadow:0 0 8px var(--yellow);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+#hero-title{font-size:clamp(3rem,8vw,5.5rem);font-weight:900;line-height:1.05;
+  letter-spacing:-1px;margin-bottom:20px}
+#hero-title .white{color:#fff}
+#hero-title .yellow{color:var(--yellow)}
+#hero-sub{font-size:1rem;color:rgba(255,255,255,.45);line-height:1.6;
+  max-width:480px;margin-bottom:40px;font-weight:400}
+#hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+#btn-join{background:var(--yellow);color:#000;border:none;border-radius:8px;
+  padding:14px 28px;font-weight:700;font-size:.92rem;cursor:pointer;
+  transition:.2s;letter-spacing:.3px}
+#btn-join:hover{background:#e6c200;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.3)}
+#btn-games{background:rgba(255,255,255,.05);color:#fff;border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;padding:14px 28px;font-weight:600;font-size:.92rem;cursor:pointer;
+  transition:.2s;display:flex;align-items:center;gap:8px}
+#btn-games:hover{background:rgba(255,255,255,.09)}
 
-/* Live ticker */
-#ticker{width:100%;max-width:900px;margin-bottom:64px;overflow:hidden;
-  background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.1);
-  border-radius:10px;padding:10px 0}
-#ticker-track{display:inline-block;white-space:nowrap;animation:scroll 25s linear infinite}
-@keyframes scroll{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
-.tick{display:inline-flex;align-items:center;gap:8px;margin:0 36px;font-size:.78rem}
-.tick-user{color:rgba(212,168,67,.7);font-weight:600}.tick-amt{color:var(--green);font-weight:700}.tick-game{color:#555}
+/* ── ARROW ── */
+#arrow{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  color:var(--yellow);font-size:1.4rem;animation:bounce 2s ease-in-out infinite;
+  cursor:pointer;z-index:50}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
 
-/* ── GAME CARDS ── */
-#cards{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;max-width:1080px;width:100%;padding:0 20px}
-@media(max-width:768px){#cards{grid-template-columns:1fr}}
-.gcard{position:relative;border-radius:20px;overflow:hidden;cursor:pointer;
-  text-decoration:none;color:#fff;display:block;
-  background:var(--card-bg);
-  transition:transform .4s cubic-bezier(.34,1.3,.64,1),box-shadow .4s}
-.gcard:hover{transform:translateY(-14px) scale(1.02)}
-/* Color-specific */
-.gc-bj{border:1px solid rgba(0,232,122,.2)}
-.gc-rl{border:1px solid rgba(255,51,85,.2)}
-.gc-sl{border:1px solid rgba(212,168,67,.2)}
-.gc-bj:hover{box-shadow:0 30px 80px rgba(0,232,122,.2),0 0 60px rgba(0,232,122,.08)}
-.gc-rl:hover{box-shadow:0 30px 80px rgba(255,51,85,.2),0 0 60px rgba(255,51,85,.08)}
-.gc-sl:hover{box-shadow:0 30px 80px rgba(212,168,67,.2),0 0 60px rgba(212,168,67,.08)}
-
-/* Top bar on card */
-.gcard-topbar{height:3px;width:100%}
-.gc-bj .gcard-topbar{background:linear-gradient(90deg,transparent,#00e87a,transparent)}
-.gc-rl .gcard-topbar{background:linear-gradient(90deg,transparent,#ff3355,transparent)}
-.gc-sl .gcard-topbar{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-
-/* Preview area */
-.gcard-preview{height:200px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.gc-bj .gcard-preview{background:radial-gradient(ellipse at 50% 100%,rgba(0,232,122,.18) 0%,transparent 65%)}
-.gc-rl .gcard-preview{background:radial-gradient(ellipse at 50% 100%,rgba(255,51,85,.18) 0%,transparent 65%)}
-.gc-sl .gcard-preview{background:radial-gradient(ellipse at 50% 100%,rgba(212,168,67,.18) 0%,transparent 65%)}
-
-.gcard-icon{font-size:5.5rem;animation:iconBob 4s ease-in-out infinite;
-  filter:drop-shadow(0 8px 24px rgba(0,0,0,.6));position:relative;z-index:2}
-.gcard:nth-child(2) .gcard-icon{animation-delay:.8s}
-.gcard:nth-child(3) .gcard-icon{animation-delay:1.6s}
-@keyframes iconBob{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.08) translateY(-8px)}}
-
-/* Shine overlay */
-.gcard-shine{position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 55%);pointer-events:none}
-
-/* Arrow */
-.gcard-arrow{position:absolute;top:16px;right:16px;font-size:1.2rem;
-  opacity:0;transition:.3s;transform:translateX(-8px)}
-.gcard:hover .gcard-arrow{opacity:.7;transform:translateX(0)}
-.gc-bj .gcard-arrow{color:#00e87a}.gc-rl .gcard-arrow{color:#ff3355}.gc-sl .gcard-arrow{color:var(--gold)}
-
-/* Card body */
-.gcard-body{padding:20px 24px 26px}
-.gcard-name{font-family:'Cinzel',serif;font-size:1.3rem;font-weight:700;letter-spacing:3px;margin-bottom:8px}
-.gc-bj .gcard-name{color:#00e87a}.gc-rl .gcard-name{color:#ff3355}.gc-sl .gcard-name{color:var(--gold)}
-.gcard-desc{font-size:.8rem;color:rgba(255,255,255,.38);line-height:1.7;margin-bottom:14px}
+/* ── GAMES SECTION ── */
+#games{padding:80px 40px;background:#0a0a0a}
+#games h2{font-size:1.8rem;font-weight:800;margin-bottom:8px}
+#games h2 span{color:var(--yellow)}
+#games-sub{color:rgba(255,255,255,.35);font-size:.88rem;margin-bottom:40px}
+#games-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px}
+@media(max-width:768px){#games-grid{grid-template-columns:1fr}}
+.gcard{background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;
+  padding:32px 28px;cursor:pointer;text-decoration:none;color:#fff;display:block;
+  transition:.25s;position:relative;overflow:hidden}
+.gcard:hover{border-color:var(--yellow);background:#131313;
+  transform:translateY(-4px);box-shadow:0 12px 40px rgba(255,215,0,.08)}
+.gcard-icon{font-size:2.8rem;margin-bottom:18px;display:block;line-height:1}
+.gcard-name{font-size:1.1rem;font-weight:800;margin-bottom:8px;letter-spacing:.5px}
+.gcard:hover .gcard-name{color:var(--yellow)}
+.gcard-desc{font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.6;margin-bottom:18px}
 .gcard-tags{display:flex;gap:6px;flex-wrap:wrap}
-.gtag{padding:3px 10px;border-radius:20px;font-size:.62rem;font-weight:600;letter-spacing:1px;font-family:'Cinzel',serif}
-.gc-bj .gtag{background:rgba(0,232,122,.1);color:#00e87a;border:1px solid rgba(0,232,122,.2)}
-.gc-rl .gtag{background:rgba(255,51,85,.1);color:#ff3355;border:1px solid rgba(255,51,85,.2)}
-.gc-sl .gtag{background:rgba(212,168,67,.1);color:var(--gold);border:1px solid rgba(212,168,67,.2)}
+.gtag{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:4px;padding:3px 10px;font-size:.62rem;font-weight:600;
+  color:rgba(255,255,255,.5);letter-spacing:.5px}
+.gcard:hover .gtag{border-color:rgba(255,215,0,.25);color:rgba(255,215,0,.7)}
+.gcard-arrow{position:absolute;top:20px;right:20px;font-size:1rem;
+  color:rgba(255,255,255,.15);transition:.2s}
+.gcard:hover .gcard-arrow{color:var(--yellow)}
 
-/* ── JACKPOT BAR ── */
-#jp-bar{position:relative;z-index:1;margin-top:64px;padding:20px 40px;
-  background:linear-gradient(90deg,rgba(5,4,13,0) 0%,rgba(212,168,67,.06) 50%,rgba(5,4,13,0) 100%);
-  border-top:1px solid rgba(212,168,67,.15);border-bottom:1px solid rgba(212,168,67,.15);
-  text-align:center;width:100%}
-#jp-label{font-size:.58rem;letter-spacing:5px;color:rgba(212,168,67,.4);
-  text-transform:uppercase;font-family:'Cinzel',serif;margin-bottom:6px}
-#jp-val-wrap{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;letter-spacing:4px;
-  background:linear-gradient(90deg,#ffe066,var(--gold),#ffaa00,var(--gold),#ffe066);
-  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  animation:shimmer 3s linear infinite,jackpotPulse 2s ease-in-out infinite}
-@keyframes shimmer{0%{background-position:0%}100%{background-position:300%}}
-@keyframes jackpotPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
-
-/* ── STATS ROW ── */
-#stats-row{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;
-  position:relative;z-index:1;padding:40px 20px 20px}
-.stat{text-align:center}
-.stat-val{font-family:'Cinzel',serif;font-size:1.6rem;font-weight:900;color:var(--gold)}
-.stat-lbl{font-size:.65rem;color:#444;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+/* ── STATS BAND ── */
+#stats{display:flex;padding:40px;gap:0;border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.06)}
+.sitem{flex:1;text-align:center;padding:0 20px}
+.sitem+.sitem{border-left:1px solid rgba(255,255,255,.06)}
+.sval{font-size:2rem;font-weight:900;color:var(--yellow)}
+.slbl{font-size:.72rem;color:rgba(255,255,255,.3);margin-top:4px;letter-spacing:1.5px;text-transform:uppercase}
 
 /* ── FOOTER ── */
-#footer{text-align:center;padding:20px;color:#222;font-size:.7rem;
-  letter-spacing:2px;font-family:'Cinzel',serif;position:relative;z-index:1}
+#footer{padding:24px 40px;text-align:center;font-size:.72rem;
+  color:rgba(255,255,255,.2);border-top:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:space-between}
+#footer .fl{font-weight:800;color:rgba(255,255,255,.4)}
+#footer .fl span{color:var(--yellow)}
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
 
-<!-- TOPBAR -->
-<div id="topbar">
-  <div id="logo-wrap">
-    <span id="logo-icon">&#9824;</span>
-    <span id="logo-text">PTIBLOND CASINO</span>
+<!-- NAVBAR -->
+<nav id="nav">
+  <a href="#" id="nav-logo">PTIBLOND<span>.</span></a>
+  <div id="nav-links">
+    <button class="nl"><span class="ico">&#127968;</span> Accueil</button>
+    <button class="nl"><span class="ico">&#127942;</span> Bonus</button>
+    <button class="nl" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})"><span class="ico">&#127918;</span> Jeux</button>
+    <button class="nl"><span class="ico">&#127381;</span> Jackpot</button>
   </div>
-  <div id="topbar-sp"></div>
-  <div id="top-right">
-    <div id="bal-badge">
-      <span class="icon">&#128176;</span>
-      <span class="txt" id="bal-val">1 000 cr.</span>
-    </div>
-    <button id="btn-discord" onclick="window.location.href='/auth/discord'">
-      <svg width="18" height="14" viewBox="0 0 71 55" fill="white">
+  <div id="nav-sp"></div>
+  <div id="nav-right">
+    <div id="nav-bal">Balance : <span id="bal-val">1 000</span> cr.</div>
+    <button id="btn-connect" onclick="window.location.href='/auth/discord'">
+      <svg width="16" height="12" viewBox="0 0 71 55" fill="black">
         <path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.2 0A38.9 38.9 0 0 0 25.5.9 58.4 58.4 0 0 0 10.8 5C1.6 18.9-.9 32.4.3 45.7a58.9 58.9 0 0 0 18 9.1 42.4 42.4 0 0 0 3.7-6 38.3 38.3 0 0 1-5.8-2.8l1.4-1.1a42 42 0 0 0 36 0l1.4 1.1a38.4 38.4 0 0 1-5.9 2.8 42.2 42.2 0 0 0 3.7 6 58.7 58.7 0 0 0 18-9 54.1 54.1 0 0 0-9.6-40.8zM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.3 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1zm23.5 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.3 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1z"/>
       </svg>
-      SE CONNECTER
+      Connexion
     </button>
     <div id="user-info">
       <img id="user-avatar" src="" alt="">
       <span id="user-name"></span>
       <button id="btn-logout" onclick="doLogout()">Quitter</button>
     </div>
-    <button id="btn-play" onclick="enterCasino()">JOUER &#9824;</button>
   </div>
-</div>
+</nav>
 
 <!-- HERO -->
-<div id="hero">
-  <span id="crown">&#128081;</span>
-  <div id="title">PTIBLOND</div>
-  <div id="subtitle">Casino Premium &bull; Jeux en Direct &bull; VIP</div>
-  <div id="sep"></div>
-
-  <!-- LIVE TICKER -->
-  <div id="ticker">
-    <div id="ticker-track">
-      <span class="tick"><span class="tick-user">MaxBet99</span><span class="tick-amt">+4 500</span><span class="tick-game">au Blackjack</span></span>
-      <span class="tick"><span class="tick-user">LuckyKing</span><span class="tick-amt">+12 000</span><span class="tick-game">a la Roulette</span></span>
-      <span class="tick"><span class="tick-user">VIPStar</span><span class="tick-amt">+7 777</span><span class="tick-game">aux Slots</span></span>
-      <span class="tick"><span class="tick-user">HighRoller</span><span class="tick-amt">+22 500</span><span class="tick-game">au Blackjack</span></span>
-      <span class="tick"><span class="tick-user">GoldHand</span><span class="tick-amt">+3 200</span><span class="tick-game">a la Roulette</span></span>
-    </div>
+<section id="hero">
+  <div id="hero-badge">
+    <div class="dot"></div>
+    Casino en ligne
   </div>
-
-  <!-- GAME CARDS -->
-  <div id="cards">
-
-    <a href="blackjack.html" class="gcard gc-bj">
-      <div class="gcard-topbar"></div>
-      <div class="gcard-preview">
-        <span class="gcard-icon">&#127183;</span>
-        <div class="gcard-shine"></div>
-      </div>
-      <span class="gcard-arrow">&#8594;</span>
-      <div class="gcard-body">
-        <div class="gcard-name">BLACKJACK</div>
-        <div class="gcard-desc">Table premium first-person. Battez le dealer, visez 21. Blackjack paye 3 pour 2.</div>
-        <div class="gcard-tags">
-          <span class="gtag">3:2</span>
-          <span class="gtag">DOUBLE</span>
-          <span class="gtag">LIVE</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="roulette.html" class="gcard gc-rl">
-      <div class="gcard-topbar"></div>
-      <div class="gcard-preview">
-        <span class="gcard-icon">&#127921;</span>
-        <div class="gcard-shine"></div>
-      </div>
-      <span class="gcard-arrow">&#8594;</span>
-      <div class="gcard-body">
-        <div class="gcard-name">ROULETTE</div>
-        <div class="gcard-desc">Roue europeenne 37 numeros. Rouge, noir ou votre numero chanceux. Bille physique.</div>
-        <div class="gcard-tags">
-          <span class="gtag">EUROPEENNE</span>
-          <span class="gtag">35:1</span>
-          <span class="gtag">LIVE</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="slots.html" class="gcard gc-sl">
-      <div class="gcard-topbar"></div>
-      <div class="gcard-preview">
-        <span class="gcard-icon">&#127920;</span>
-        <div class="gcard-shine"></div>
-      </div>
-      <span class="gcard-arrow">&#8594;</span>
-      <div class="gcard-body">
-        <div class="gcard-name">SLOTS</div>
-        <div class="gcard-desc">3 bobines, 8 symboles, jackpot progressif partage. Multiplicateurs et auto-spin.</div>
-        <div class="gcard-tags">
-          <span class="gtag">JACKPOT</span>
-          <span class="gtag">x500</span>
-          <span class="gtag">AUTO</span>
-        </div>
-      </div>
-    </a>
-
+  <div id="hero-title">
+    <div class="white">PTIBLOND</div>
+    <div class="yellow">CASINO</div>
   </div>
-
-  <!-- STATS -->
-  <div id="stats-row">
-    <div class="stat"><div class="stat-val" id="stat-players">—</div><div class="stat-lbl">Joueurs</div></div>
-    <div class="stat"><div class="stat-val" id="stat-games">—</div><div class="stat-lbl">Parties</div></div>
-    <div class="stat"><div class="stat-val" id="stat-jackpots">—</div><div class="stat-lbl">Jackpots</div></div>
+  <div id="hero-sub">
+    Joue au blackjack, roulette et machines a sous.<br>
+    Gagne des credits, grimpe dans le classement.
   </div>
+  <div id="hero-btns">
+    <button id="btn-join" onclick="window.location.href='/auth/discord'">Rejoindre la communaute</button>
+    <button id="btn-games" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">
+      Decouvrir les jeux <span>&#8964;</span>
+    </button>
+  </div>
+</section>
 
+<div id="arrow" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">&#8964;</div>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="sitem"><div class="sval" id="s-players">—</div><div class="slbl">Joueurs</div></div>
+  <div class="sitem"><div class="sval" id="s-games">—</div><div class="slbl">Parties jouees</div></div>
+  <div class="sitem"><div class="sval" id="s-jackpots">—</div><div class="slbl">Jackpots</div></div>
+  <div class="sitem"><div class="sval" id="s-jp">10 000</div><div class="slbl">Jackpot actuel</div></div>
 </div>
 
-<!-- JACKPOT BAR -->
-<div id="jp-bar">
-  <div id="jp-label">Jackpot Progressif</div>
-  <div id="jp-val-wrap">&#128176; <span id="jp-val">10 000</span> cr. &#128176;</div>
-</div>
+<!-- GAMES -->
+<section id="games">
+  <h2>Nos <span>Jeux</span></h2>
+  <div id="games-sub">Choisis ton jeu et commence a jouer maintenant</div>
+  <div id="games-grid">
 
-<div id="footer">PTIBLOND CASINO &bull; PREMIUM &bull; 2026</div>
+    <a href="blackjack.html" class="gcard">
+      <span class="gcard-icon">&#127183;</span>
+      <div class="gcard-name">BLACKJACK</div>
+      <div class="gcard-desc">Table first-person premium. Battez le dealer, visez 21. Blackjack paye 3 pour 2.</div>
+      <div class="gcard-tags">
+        <span class="gtag">3:2</span>
+        <span class="gtag">DOUBLE</span>
+        <span class="gtag">LIVE</span>
+      </div>
+      <span class="gcard-arrow">&#8599;</span>
+    </a>
+
+    <a href="roulette.html" class="gcard">
+      <span class="gcard-icon">&#127921;</span>
+      <div class="gcard-name">ROULETTE</div>
+      <div class="gcard-desc">Roue europeenne 37 numeros. Rouge, noir, plein, douzaines. Bille animee.</div>
+      <div class="gcard-tags">
+        <span class="gtag">EUROPEENNE</span>
+        <span class="gtag">35:1</span>
+        <span class="gtag">LIVE</span>
+      </div>
+      <span class="gcard-arrow">&#8599;</span>
+    </a>
+
+    <a href="slots.html" class="gcard">
+      <span class="gcard-icon">&#127920;</span>
+      <div class="gcard-name">MACHINES A SOUS</div>
+      <div class="gcard-desc">3 bobines, 8 symboles, jackpot progressif partage entre tous les joueurs.</div>
+      <div class="gcard-tags">
+        <span class="gtag">JACKPOT</span>
+        <span class="gtag">x500</span>
+        <span class="gtag">AUTO</span>
+      </div>
+      <span class="gcard-arrow">&#8599;</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div id="footer">
+  <div class="fl">PTIBLOND<span>.</span></div>
+  <div>Casino en ligne &bull; 2026</div>
+  <div>Tous droits reserves</div>
+</div>
 
 <script>
-// ── CANVAS BG ──
-(function(){
-  var c=document.getElementById('bg');
-  var ctx=c.getContext('2d');
-  var W,H,pts=[],shapes=[];
-  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
-  window.addEventListener('resize',resize);resize();
-  for(var i=0;i<100;i++) pts.push({x:Math.random()*W,y:Math.random()*H,
-    vx:(Math.random()-.5)*.25,vy:-(Math.random()*.35+.05),
-    r:Math.random()*1.4+.3,op:Math.random()*.4+.05});
-  var cardTypes=['card','chip'];
-  for(var i=0;i<20;i++) shapes.push({type:cardTypes[i%2],x:Math.random()*W,y:Math.random()*H,
-    rot:Math.random()*Math.PI*2,drot:(Math.random()-.5)*.003,
-    sp:Math.random()*.18+.04,op:Math.random()*.05+.015,size:Math.random()*22+14});
-  function loop(){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#05040d';ctx.fillRect(0,0,W,H);
-    // Vignette
-    var g=ctx.createRadialGradient(W/2,H/2,H*.1,W/2,H/2,H*.85);
-    g.addColorStop(0,'rgba(5,4,13,0)');g.addColorStop(1,'rgba(5,4,13,.7)');
-    // Shapes
-    shapes.forEach(function(s){
-      s.y-=s.sp;s.rot+=s.drot;
-      if(s.y<-60){s.y=H+60;s.x=Math.random()*W;}
-      ctx.save();ctx.globalAlpha=s.op;ctx.translate(s.x,s.y);ctx.rotate(s.rot);
-      ctx.strokeStyle='rgba(212,168,67,.7)';ctx.lineWidth=1;
-      if(s.type==='card'){
-        ctx.strokeRect(-s.size*.35,-s.size*.5,s.size*.7,s.size);
-      } else {
-        ctx.beginPath();ctx.arc(0,0,s.size/2,0,Math.PI*2);ctx.stroke();
-        ctx.beginPath();ctx.arc(0,0,s.size*.38,0,Math.PI*2);ctx.stroke();
-      }
-      ctx.restore();
-    });
-    // Particles
-    pts.forEach(function(p,i){
-      p.x+=p.vx;p.y+=p.vy;
-      if(p.y<-4){p.y=H+4;p.x=Math.random()*W;}
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(212,168,67,'+p.op+')';ctx.fill();
-    });
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    requestAnimationFrame(loop);
-  }
-  loop();
-})();
-
-// ── BALANCE ──
 function updateBal(){
   var pl=JSON.parse(localStorage.getItem('casino_player')||'{"balance":1000}');
-  document.getElementById('bal-val').textContent=(pl.balance||1000).toLocaleString('fr-FR')+' cr.';
+  document.getElementById('bal-val').textContent=(pl.balance||1000).toLocaleString('fr-FR');
 }
 updateBal();
 
-function enterCasino(){ window.location.href='blackjack.html'; }
+function enterCasino(){window.location.href='blackjack.html';}
 
-// ── JACKPOT TICKER ──
+// Jackpot ticker
 var jp=10000;
-(function tick(){jp+=Math.floor(Math.random()*8)+1;document.getElementById('jp-val').textContent=jp.toLocaleString('fr-FR');setTimeout(tick,600+Math.random()*800);})();
+(function tick(){jp+=Math.floor(Math.random()*6)+1;
+  document.getElementById('s-jp').textContent=jp.toLocaleString('fr-FR');
+  setTimeout(tick,700+Math.random()*600);})();
 
-// ── STATS ──
+// Stats API
 fetch('/api/stats').then(function(r){return r.json();}).then(function(d){
-  if(d.totalPlayers!==undefined) document.getElementById('stat-players').textContent=d.totalPlayers;
-  if(d.totalGames!==undefined) document.getElementById('stat-games').textContent=d.totalGames;
-  if(d.totalJackpots!==undefined) document.getElementById('stat-jackpots').textContent=d.totalJackpots;
+  if(d.totalPlayers!==undefined) document.getElementById('s-players').textContent=d.totalPlayers;
+  if(d.totalGames!==undefined) document.getElementById('s-games').textContent=d.totalGames;
+  if(d.totalJackpots!==undefined) document.getElementById('s-jackpots').textContent=d.totalJackpots;
 }).catch(function(){});
 
-// ── DISCORD AUTH ──
+// Discord auth
 var SESSION_TOKEN=localStorage.getItem('discord_session')||'';
 function checkSession(){
   var p=new URLSearchParams(window.location.search);
@@ -361,7 +260,7 @@ function checkSession(){
       var pl={name:u.username,balance:u.balance,discordId:u.id,avatar:u.avatar};
       localStorage.setItem('casino_player',JSON.stringify(pl));
       updateBal();
-      document.getElementById('btn-discord').style.display='none';
+      document.getElementById('btn-connect').style.display='none';
       document.getElementById('user-info').style.display='flex';
       document.getElementById('user-avatar').src=u.avatar;
       document.getElementById('user-name').textContent=u.username;
@@ -372,7 +271,7 @@ function doLogout(){
   fetch('/auth/logout?token='+SESSION_TOKEN);
   localStorage.removeItem('discord_session');localStorage.removeItem('casino_player');
   SESSION_TOKEN='';
-  document.getElementById('btn-discord').style.display='flex';
+  document.getElementById('btn-connect').style.display='flex';
   document.getElementById('user-info').style.display='none';
   updateBal();
 }
@@ -385,19 +284,7 @@ function doLogout(){
     var pl=JSON.parse(localStorage.getItem('casino_player')||'{"name":"Invite","balance":1000}');
     s.emit('identify',{name:pl.name,balance:pl.balance});
   });
-  s.on('jackpot_update',function(d){
-    if(d&&d.slots) document.getElementById('jp-val').textContent=d.slots.toLocaleString('fr-FR');
-  });
-  s.on('live_event',function(ev){
-    var track=document.getElementById('ticker-track');
-    if(!track)return;
-    var icons={roulette:'&#127921;',slots_spin:'&#127920;',slots_jackpot:'&#128176;',blackjack:'&#127183;',blackjack_web:'&#127183;'};
-    var icon=icons[ev.type]||'&#127918;';
-    var name=ev.player||'Joueur';
-    var gain=ev.gain>0?' +'+ev.gain:'';
-    var item='<span class="tick"><span class="tick-user">'+name+'</span><span class="tick-amt">'+gain+'</span><span class="tick-game">'+ev.type.replace(/_/g,' ')+'</span></span>  ';
-    track.innerHTML=item+track.innerHTML.slice(0,400);
-  });
+  s.on('jackpot_update',function(d){if(d&&d.slots)document.getElementById('s-jp').textContent=d.slots.toLocaleString('fr-FR');});
   s.on('admin_balance_update',function(d){
     if(d&&d.newBalance!==undefined){
       var pl=JSON.parse(localStorage.getItem('casino_player')||'{"balance":1000}');
