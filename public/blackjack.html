@@ -7,31 +7,71 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Rajdhani',sans-serif;color:#fff;user-select:none;background:#060a06}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Rajdhani',sans-serif;color:#fff;user-select:none;background:#050d05}
 canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── ROOM PREMIUM — murs verts sombres style casino Evolution ── */
 #room{position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:radial-gradient(ellipse at 50% -5%,rgba(0,80,20,.7) 0%,transparent 55%),
-    radial-gradient(ellipse at 50% 105%,rgba(0,0,0,.95) 0%,transparent 55%)}
+  background:
+    radial-gradient(ellipse at 50% -8%, rgba(0,60,15,.9) 0%,transparent 45%),
+    radial-gradient(ellipse at 0% 50%, rgba(0,40,10,.6) 0%,transparent 40%),
+    radial-gradient(ellipse at 100% 50%, rgba(0,40,10,.6) 0%,transparent 40%),
+    radial-gradient(ellipse at 50% 108%, rgba(0,0,0,.99) 0%,transparent 50%),
+    linear-gradient(180deg,#0a1a0a 0%,#050d05 100%)}
+/* Colonnes dorées style casino sur les bords */
+#room::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(180,140,30,.18) 0%,rgba(100,80,10,.05) 60%,transparent 100%),
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(180,140,30,.08) 2%,rgba(180,140,30,.04) 3%,transparent 4%,
+      transparent 96%,
+      rgba(180,140,30,.04) 97%,rgba(180,140,30,.08) 98%,transparent 100%)}
+
+/* ── SCENE — perspective first-person ── */
 #scene{position:fixed;inset:0;z-index:2;display:flex;align-items:center;
-  justify-content:center;perspective:1100px;perspective-origin:50% 18%}
-#table{position:relative;width:1040px;height:570px;
-  transform:rotateX(30deg) translateY(52px);
-  transform-origin:50% 100%;transform-style:preserve-3d}
+  justify-content:center;perspective:1200px;perspective-origin:50% 15%}
+
+/* ── TABLE ── */
+#table{position:relative;width:1100px;height:600px;
+  transform:rotateX(32deg) translateY(48px);
+  transform-origin:50% 100%;transform-style:preserve-3d;
+  filter:drop-shadow(0 60px 120px rgba(0,0,0,.99))}
+
+/* ── FELT PREMIUM ── */
 #felt{position:absolute;inset:0;overflow:hidden;
-  border-radius:52% 52% 5% 5%/28% 28% 3% 3%;
-  background:radial-gradient(ellipse at 50% 30%,#1f7338 0%,#165b2c 42%,#0e3e1e 78%,#07230e 100%);
-  box-shadow:0 0 0 17px #2c1907,0 0 0 20px #c9a040,0 0 0 22px #a07828,
-    0 0 0 38px #180c04,inset 0 0 110px rgba(0,0,0,.55),
-    0 65px 130px rgba(0,0,0,.98)}
-#felt::before{content:'';position:absolute;inset:0;opacity:.038;pointer-events:none;
-  background-image:repeating-linear-gradient(0deg,transparent 0,transparent 3px,#fff 3px,#fff 4px),
-    repeating-linear-gradient(90deg,transparent 0,transparent 3px,#fff 3px,#fff 4px)}
-#felt::after{content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at 50% -15%,rgba(255,255,200,.07) 0%,transparent 55%)}
-#felt-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-#dealer-zone{position:absolute;top:6%;left:50%;transform:translateX(-50%);
+  border-radius:54% 54% 4% 4%/30% 30% 2% 2%;
+  background:
+    radial-gradient(ellipse at 50% 20%,rgba(255,255,180,.04) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 50%,#1e7538 0%,#155f2a 45%,#0c4018 80%,#061a0a 100%);
+  /* Bord massif en bois multi-couches */
+  box-shadow:
+    0 0 0 20px #1a0a02,
+    0 0 0 23px #d4a030,
+    0 0 0 25px #a07020,
+    0 0 0 28px #6a4010,
+    0 0 0 44px #0d0600,
+    inset 0 0 120px rgba(0,0,0,.6),
+    inset 0 -30px 80px rgba(0,0,0,.4),
+    0 80px 160px rgba(0,0,0,.99)}
+
+/* Texture tissu tissé premium */
+#felt::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  opacity:.042;
+  background-image:
+    repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(255,255,255,1) 3px,rgba(255,255,255,1) 4px),
+    repeating-linear-gradient(90deg,transparent 0,transparent 3px,rgba(255,255,255,1) 3px,rgba(255,255,255,1) 4px)}
+
+/* Spotlight overhead — lumière douce au centre */
+#felt::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 50% -10%,rgba(255,255,200,.1) 0%,transparent 55%),
+    radial-gradient(ellipse at 50% 50%,rgba(255,255,200,.03) 0%,transparent 65%)}
+
+#felt-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+#dealer-zone{position:absolute;top:5%;left:50%;transform:translateX(-50%);
   display:flex;gap:13px;align-items:flex-end;min-height:135px;z-index:10}
-#player-zone{position:absolute;bottom:19%;left:50%;transform:translateX(-50%);
+#player-zone{position:absolute;bottom:17%;left:50%;transform:translateX(-50%);
   display:flex;gap:13px;align-items:flex-end;min-height:135px;z-index:10}
 .card{width:85px;height:120px;border-radius:9px;flex-shrink:0;position:relative;
   background:linear-gradient(155deg,#fff,#f4efe2);
@@ -72,12 +112,17 @@ canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 .sbadge.bj{border-color:#ffd700;color:#ffd700;box-shadow:0 0 18px rgba(255,215,0,.4)}
 #dealer-score{top:1.5%;left:50%;transform:translateX(-50%)}
 #player-score{bottom:11%;left:50%;transform:translateX(-50%)}
-#chip-tray{position:absolute;top:3.5%;right:2.5%;display:flex;gap:5px;align-items:flex-end;
-  z-index:20;background:rgba(0,0,0,.52);border-radius:44px;padding:8px 13px;
-  border:1px solid rgba(255,255,255,.07);box-shadow:0 3px 14px rgba(0,0,0,.55)}
+/* ── CHIP TRAY — centre haut comme Evolution ── */
+#chip-tray{position:absolute;top:2.5%;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;align-items:flex-end;z-index:20;
+  background:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.5));
+  border-radius:8px 8px 12px 12px;padding:10px 16px 8px;
+  border:1px solid rgba(200,160,50,.2);border-top:2px solid rgba(200,160,50,.35);
+  box-shadow:0 4px 20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05)}
 .tray-stack{display:flex;flex-direction:column-reverse;gap:2px}
-.tray-c{width:38px;height:13px;border-radius:50%;
-  border:2px solid rgba(0,0,0,.42);box-shadow:0 2px 5px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.18)}
+.tray-c{width:40px;height:14px;border-radius:50%;
+  border:2px solid rgba(0,0,0,.5);
+  box-shadow:0 2px 6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.3)}
 #bet-stack{position:absolute;bottom:18%;left:50%;transform:translateX(-50%);
   width:56px;height:72px;z-index:12}
 .placed{position:absolute;left:50%;transform:translateX(-50%);
@@ -226,40 +271,153 @@ canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 <div id="scene">
   <div id="table">
     <div id="felt">
-      <svg id="felt-svg" viewBox="0 0 1040 570" preserveAspectRatio="none">
+      <svg id="felt-svg" viewBox="0 0 1100 600" preserveAspectRatio="none">
         <defs>
-          <filter id="gl"><feGaussianBlur stdDeviation="2.5" result="b"/>
+          <filter id="gl"><feGaussianBlur stdDeviation="3" result="b"/>
             <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="gls"><feGaussianBlur stdDeviation="1.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <!-- Gradient bois pour card shoe -->
+          <linearGradient id="shoeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#2a1a08;stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:#1a0d04;stop-opacity:1"/>
+          </linearGradient>
         </defs>
-        <path d="M 28,570 A 550,550 0 0,1 1012,570" fill="none" stroke="rgba(200,160,50,.1)" stroke-width="1"/>
-        <path d="M 65,570 A 515,515 0 0,1 975,570" fill="none"
-          stroke="rgba(200,160,50,.55)" stroke-width="2.5" filter="url(#gl)"/>
-        <path d="M 85,570 A 495,495 0 0,1 955,570" fill="none"
-          stroke="rgba(200,160,50,.2)" stroke-width="1.5"/>
-        <line x1="148" y1="126" x2="892" y2="126" stroke="rgba(200,160,50,.28)" stroke-width="1"/>
-        <line x1="148" y1="129" x2="892" y2="129" stroke="rgba(200,160,50,.1)" stroke-width=".5"/>
-        <text x="520" y="117" text-anchor="middle" fill="rgba(200,160,50,.32)"
-          font-family="Oswald,sans-serif" font-size="10.5" letter-spacing="4">INSURANCE PAYS 2 TO 1</text>
-        <line x1="305" y1="265" x2="735" y2="265" stroke="rgba(200,160,50,.18)" stroke-width=".8"/>
-        <line x1="305" y1="348" x2="735" y2="348" stroke="rgba(200,160,50,.18)" stroke-width=".8"/>
-        <text x="520" y="298" text-anchor="middle" fill="rgba(200,160,50,.58)"
-          font-family="Oswald,sans-serif" font-size="29" letter-spacing="10" font-weight="600"
+
+        <!-- ─── ARCS PRINCIPAUX ─── -->
+        <path d="M 20,600 A 590,590 0 0,1 1080,600" fill="none" stroke="rgba(200,160,50,.08)" stroke-width="1"/>
+        <path d="M 55,600 A 555,555 0 0,1 1045,600" fill="none"
+          stroke="rgba(200,160,50,.6)" stroke-width="3" filter="url(#gl)"/>
+        <path d="M 72,600 A 538,538 0 0,1 1028,600" fill="none"
+          stroke="rgba(200,160,50,.25)" stroke-width="1.5"/>
+        <path d="M 90,600 A 520,520 0 0,1 1010,600" fill="none"
+          stroke="rgba(200,160,50,.1)" stroke-width="1"/>
+
+        <!-- ─── LIGNE INSURANCE ─── -->
+        <line x1="160" y1="132" x2="940" y2="132" stroke="rgba(200,160,50,.35)" stroke-width="1.2"/>
+        <line x1="160" y1="135" x2="940" y2="135" stroke="rgba(200,160,50,.12)" stroke-width=".6"/>
+        <text x="550" y="122" text-anchor="middle" fill="rgba(200,160,50,.4)"
+          font-family="Oswald,sans-serif" font-size="11" letter-spacing="5">INSURANCE PAYS 2 TO 1</text>
+
+        <!-- ─── ZONE CENTRALE TEXTES ─── -->
+        <line x1="320" y1="275" x2="780" y2="275" stroke="rgba(200,160,50,.22)" stroke-width=".8"/>
+
+        <!-- PLACE YOUR BETS -->
+        <text x="550" y="248" text-anchor="middle" fill="rgba(255,255,255,.45)"
+          font-family="Oswald,sans-serif" font-size="13" letter-spacing="5" font-weight="400">PLACEZ VOS MISES</text>
+
+        <!-- PTIBLOND — grand et brillant -->
+        <text x="550" y="312" text-anchor="middle" fill="rgba(200,160,50,.72)"
+          font-family="Oswald,sans-serif" font-size="34" letter-spacing="12" font-weight="700"
           filter="url(#gl)">PTIBLOND</text>
-        <text x="520" y="328" text-anchor="middle" fill="rgba(200,160,50,.42)"
-          font-family="Oswald,sans-serif" font-size="14" letter-spacing="3.5" font-weight="500">BLACKJACK PAYS 3 TO 2</text>
-        <text x="520" y="356" text-anchor="middle" fill="rgba(200,160,50,.2)"
-          font-family="Oswald,sans-serif" font-size="10" letter-spacing="2.5">DEALER MUST STAND ON ALL 17s</text>
-        <circle cx="520" cy="428" r="31" fill="rgba(200,160,50,.07)"
-          stroke="rgba(200,160,50,.58)" stroke-width="2.2"/>
-        <circle cx="520" cy="428" r="23" fill="none" stroke="rgba(200,160,50,.2)" stroke-width="1"/>
-        <circle cx="342" cy="460" r="27" fill="rgba(0,0,0,.1)" stroke="rgba(200,160,50,.3)" stroke-width="1.8"/>
-        <circle cx="342" cy="460" r="19" fill="none" stroke="rgba(200,160,50,.1)" stroke-width="1"/>
-        <circle cx="180" cy="532" r="25" fill="rgba(0,0,0,.1)" stroke="rgba(200,160,50,.22)" stroke-width="1.5"/>
-        <circle cx="698" cy="460" r="27" fill="rgba(0,0,0,.1)" stroke="rgba(200,160,50,.3)" stroke-width="1.8"/>
-        <circle cx="698" cy="460" r="19" fill="none" stroke="rgba(200,160,50,.1)" stroke-width="1"/>
-        <circle cx="860" cy="532" r="25" fill="rgba(0,0,0,.1)" stroke="rgba(200,160,50,.22)" stroke-width="1.5"/>
-        <polygon points="78,58 88,73 78,88 68,73" fill="rgba(200,160,50,.22)"/>
-        <polygon points="962,58 972,73 962,88 952,73" fill="rgba(200,160,50,.22)"/>
+
+        <line x1="320" y1="325" x2="780" y2="325" stroke="rgba(200,160,50,.22)" stroke-width=".8"/>
+
+        <!-- BLACKJACK PAYS 3 TO 2 -->
+        <text x="550" y="354" text-anchor="middle" fill="rgba(255,255,255,.75)"
+          font-family="Oswald,sans-serif" font-size="16" letter-spacing="4" font-weight="600"
+          filter="url(#gls)">BLACKJACK PAYS 3 TO 2</text>
+
+        <!-- Dealer stands -->
+        <text x="550" y="378" text-anchor="middle" fill="rgba(200,160,50,.28)"
+          font-family="Oswald,sans-serif" font-size="10.5" letter-spacing="2.5">Dealer tient sur tous les 17</text>
+
+        <!-- ─── CERCLES DE MISE — 5 positions sur l'arc ─── -->
+        <!-- Centre (actif) -->
+        <circle cx="550" cy="452" r="34" fill="rgba(200,160,50,.08)"
+          stroke="rgba(200,160,50,.7)" stroke-width="2.5"/>
+        <circle cx="550" cy="452" r="26" fill="none"
+          stroke="rgba(200,160,50,.3)" stroke-width="1.2"/>
+        <circle cx="550" cy="452" r="18" fill="none"
+          stroke="rgba(200,160,50,.12)" stroke-width=".8"/>
+
+        <!-- Gauche 1 -->
+        <circle cx="368" cy="484" r="30" fill="rgba(0,0,0,.12)"
+          stroke="rgba(200,160,50,.4)" stroke-width="2"/>
+        <circle cx="368" cy="484" r="22" fill="none"
+          stroke="rgba(200,160,50,.15)" stroke-width="1"/>
+        <!-- Gauche 2 -->
+        <circle cx="200" cy="556" r="27" fill="rgba(0,0,0,.1)"
+          stroke="rgba(200,160,50,.28)" stroke-width="1.8"/>
+        <!-- Droite 1 -->
+        <circle cx="732" cy="484" r="30" fill="rgba(0,0,0,.12)"
+          stroke="rgba(200,160,50,.4)" stroke-width="2"/>
+        <circle cx="732" cy="484" r="22" fill="none"
+          stroke="rgba(200,160,50,.15)" stroke-width="1"/>
+        <!-- Droite 2 -->
+        <circle cx="900" cy="556" r="27" fill="rgba(0,0,0,.1)"
+          stroke="rgba(200,160,50,.28)" stroke-width="1.8"/>
+
+        <!-- ─── PERFECT PAIRS — gauche ─── -->
+        <rect x="68" y="200" width="110" height="160" rx="8"
+          fill="rgba(0,0,0,.25)" stroke="rgba(200,160,50,.3)" stroke-width="1.2"/>
+        <text x="123" y="228" text-anchor="middle" fill="rgba(200,160,50,.55)"
+          font-family="Oswald,sans-serif" font-size="9" letter-spacing="2">PERFECT</text>
+        <text x="123" y="244" text-anchor="middle" fill="rgba(200,160,50,.55)"
+          font-family="Oswald,sans-serif" font-size="9" letter-spacing="2">PAIRS</text>
+        <line x1="82" y1="252" x2="164" y2="252" stroke="rgba(200,160,50,.2)" stroke-width=".8"/>
+        <text x="123" y="267" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Mixed Pair 5:1</text>
+        <text x="123" y="280" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Colour Pair 10:1</text>
+        <text x="123" y="293" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Perfect Pair 30:1</text>
+        <!-- Cercle PP -->
+        <circle cx="123" cy="330" r="18" fill="rgba(200,160,50,.06)"
+          stroke="rgba(200,160,50,.35)" stroke-width="1.5"/>
+        <text x="123" y="334" text-anchor="middle" fill="rgba(200,160,50,.5)"
+          font-family="Oswald,sans-serif" font-size="7.5" letter-spacing="1">PP</text>
+
+        <!-- ─── 21+3 — droite ─── -->
+        <rect x="922" y="200" width="110" height="160" rx="8"
+          fill="rgba(0,0,0,.25)" stroke="rgba(200,160,50,.3)" stroke-width="1.2"/>
+        <text x="977" y="228" text-anchor="middle" fill="rgba(200,160,50,.55)"
+          font-family="Oswald,sans-serif" font-size="14" letter-spacing="2" font-weight="700">21+3</text>
+        <line x1="936" y1="238" x2="1018" y2="238" stroke="rgba(200,160,50,.2)" stroke-width=".8"/>
+        <text x="977" y="255" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Flush 5:1</text>
+        <text x="977" y="268" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Straight 10:1</text>
+        <text x="977" y="281" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Three of a Kind 30:1</text>
+        <text x="977" y="294" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Straight Flush 40:1</text>
+        <text x="977" y="307" text-anchor="middle" fill="rgba(255,255,255,.25)"
+          font-family="Oswald,sans-serif" font-size="8">Suited Trips 100:1</text>
+        <!-- Cercle 21+3 -->
+        <circle cx="977" cy="335" r="18" fill="rgba(200,160,50,.06)"
+          stroke="rgba(200,160,50,.35)" stroke-width="1.5"/>
+        <text x="977" y="340" text-anchor="middle" fill="rgba(200,160,50,.5)"
+          font-family="Oswald,sans-serif" font-size="7" letter-spacing="0">21+3</text>
+
+        <!-- ─── CARD SHOE — droite haut ─── -->
+        <rect x="880" y="32" width="70" height="90" rx="6"
+          fill="url(#shoeGrad)" stroke="rgba(200,160,50,.25)" stroke-width="1.2"/>
+        <!-- Acrylic front -->
+        <rect x="888" y="38" width="54" height="78" rx="4"
+          fill="rgba(100,180,255,.06)" stroke="rgba(150,200,255,.15)" stroke-width=".8"/>
+        <!-- Cards in shoe -->
+        <rect x="892" y="42" width="46" height="8" rx="1" fill="rgba(250,250,240,.7)"/>
+        <rect x="892" y="51" width="46" height="2" rx="1" fill="rgba(200,160,50,.3)"/>
+        <rect x="892" y="54" width="46" height="8" rx="1" fill="rgba(250,250,240,.6)"/>
+        <rect x="892" y="63" width="46" height="8" rx="1" fill="rgba(250,250,240,.5)"/>
+        <rect x="892" y="72" width="46" height="8" rx="1" fill="rgba(250,250,240,.4)"/>
+        <text x="915" y="122" text-anchor="middle" fill="rgba(200,160,50,.4)"
+          font-family="Oswald,sans-serif" font-size="7" letter-spacing="1">SHOE</text>
+
+        <!-- ─── DISCARD TRAY — gauche haut ─── -->
+        <rect x="150" y="38" width="55" height="76" rx="5"
+          fill="rgba(0,0,0,.4)" stroke="rgba(200,160,50,.2)" stroke-width="1"/>
+        <rect x="156" y="43" width="43" height="65" rx="3"
+          fill="rgba(255,255,255,.04)" stroke="rgba(200,160,50,.1)" stroke-width=".5"/>
+        <text x="177" y="122" text-anchor="middle" fill="rgba(200,160,50,.3)"
+          font-family="Oswald,sans-serif" font-size="6.5" letter-spacing="1">DISCARD</text>
+
+        <!-- ─── LOSANGES DÉCO COINS ─── -->
+        <polygon points="78,55 90,72 78,89 66,72" fill="rgba(200,160,50,.3)"
+          stroke="rgba(200,160,50,.5)" stroke-width=".8"/>
+        <polygon points="1022,55 1034,72 1022,89 1010,72" fill="rgba(200,160,50,.3)"
+          stroke="rgba(200,160,50,.5)" stroke-width=".8"/>
       </svg>
       <div id="chip-tray">
         <div class="tray-stack" id="tr0"></div>
