@@ -12,6 +12,8 @@ const fetch = globalThis.fetch || require("node-fetch");
 const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://zertix1416_db_user:VCe8Ua9hQJm08FGA@cluster0.l3wo0a1.mongodb.net/?appName=Cluster0";
 let db = null;
 let playersCol = null;
+let giveawaysCol = null;
+let giveaways = {};
 
 async function connectMongo() {
     try {
@@ -19,7 +21,12 @@ async function connectMongo() {
         await client.connect();
         db = client.db("casino");
         playersCol = db.collection("players");
+        giveawaysCol = db.collection("giveaways");
         console.log("✅ MongoDB connecté");
+        // Charge les giveaways depuis MongoDB au démarrage
+        const saved = await giveawaysCol.find({}).toArray();
+        saved.forEach(g => { giveaways[g.id] = g; });
+        console.log(`✅ ${saved.length} giveaway(s) chargé(s)`);
     } catch(e) {
         console.error("❌ MongoDB erreur:", e.message);
     }
@@ -38,6 +45,17 @@ async function savePlayer(id, data) {
 async function getAllPlayers() {
     if (!playersCol) return [];
     return await playersCol.find({}).toArray();
+}
+
+async function saveGiveaway(g) {
+    if (giveawaysCol) {
+        await giveawaysCol.updateOne({ id: g.id }, { $set: g }, { upsert: true }).catch(() => {});
+    }
+}
+async function deleteGiveaway(id) {
+    if (giveawaysCol) {
+        await giveawaysCol.deleteOne({ id }).catch(() => {});
+    }
 }
 
 connectMongo();
@@ -137,16 +155,35 @@ app.get("/auth/callback", async (req, res) => {
     }
 });
 
-// Récupère l'utilisateur connecté — balance depuis economy partagé avec le bot
+// Récupère l'utilisateur connecté — balance depuis MongoDB (source de vérité)
 app.get("/auth/me", async (req, res) => {
     const token = req.query.token || req.headers["x-session-token"];
     if (!token || !sessions[token]) return res.status(401).json({ error: "Non connecté" });
     const user = sessions[token];
     const eco = getEconomy();
+
+    // Pas encore en mémoire → charger depuis MongoDB
     if (!eco[user.id]) {
-        eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
-        saveEconomyShared();
+        const dbPlayer = await getPlayer(user.id);
+        if (dbPlayer) {
+            // Restaurer depuis MongoDB dans l'objet economy partagé
+            eco[user.id] = {
+                money: dbPlayer.money ?? 1000,
+                bank: dbPlayer.bank ?? 0,
+                wins: dbPlayer.wins ?? 0,
+                losses: dbPlayer.losses ?? 0,
+                games: dbPlayer.games ?? 0,
+                winstreak: dbPlayer.winstreak ?? 0,
+                bestWinstreak: dbPlayer.bestWinstreak ?? 0,
+                jackpots: dbPlayer.jackpots ?? 0
+            };
+        } else {
+            // Vraiment nouveau joueur — créer avec 1000 et sauvegarder
+            eco[user.id] = { money: 1000, bank: 0, wins: 0, losses: 0, games: 0, winstreak: 0, bestWinstreak: 0, jackpots: 0 };
+            saveEconomyShared();
+        }
     }
+
     res.json({ ...user, balance: eco[user.id].money, stats: eco[user.id] });
 });
 
@@ -363,7 +400,6 @@ global.pushLiveFeed = pushLiveFeed;
 // ═══════════════════════════════════════
 //  GIVEAWAY API
 // ═══════════════════════════════════════
-let giveaways = {};
 
 app.post("/api/giveaway/create", adminAuth, (req, res) => {
     const { title, description, prize, duration, maxEntries } = req.body;
@@ -375,6 +411,7 @@ app.post("/api/giveaway/create", adminAuth, (req, res) => {
         maxEntries: parseInt(maxEntries)||0,
         entries: [], winner: null, active: true, createdAt: Date.now()
     };
+    saveGiveaway(giveaways[id]);
     if (global.io) global.io.emit("giveaway_new", giveaways[id]);
     res.json({ ok: true, giveaway: giveaways[id] });
 });
@@ -399,6 +436,7 @@ app.post("/api/giveaway/enter", (req, res) => {
     if (g.entries.find(e => e.id === user.id)) return res.status(400).json({ error: "Tu participes deja !" });
     if (g.maxEntries > 0 && g.entries.length >= g.maxEntries) return res.status(400).json({ error: "Complet" });
     g.entries.push({ id: user.id, username: user.username, avatar: user.avatar, enteredAt: Date.now() });
+    saveGiveaway(g);
     if (global.io) global.io.emit("giveaway_update", { id: giveawayId, entriesCount: g.entries.length });
     res.json({ ok: true, entriesCount: g.entries.length });
 });
@@ -410,6 +448,7 @@ app.post("/api/giveaway/draw", adminAuth, (req, res) => {
     if (!g.entries.length) return res.status(400).json({ error: "Aucun participant" });
     const winner = g.entries[Math.floor(Math.random() * g.entries.length)];
     g.winner = winner; g.active = false;
+    saveGiveaway(g);
     const prizeNum = parseInt(g.prize);
     if (!isNaN(prizeNum) && prizeNum > 0) {
         const eco = getEconomy();
@@ -422,6 +461,7 @@ app.post("/api/giveaway/draw", adminAuth, (req, res) => {
 });
 
 app.delete("/api/giveaway/:id", adminAuth, (_req, res) => {
+    deleteGiveaway(_req.params.id);
     delete giveaways[_req.params.id];
     res.json({ ok: true });
 });
