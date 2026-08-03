@@ -100,23 +100,35 @@ async function syncFromMongo() {
         const players = await playersCol.find({}).toArray();
         players.forEach(p => {
             economy[p._id] = {
-                money: p.money || 1000,
-                bank: p.bank || 0,
-                wins: p.wins || 0,
-                losses: p.losses || 0,
-                games: p.games || 0,
-                winstreak: p.winstreak || 0,
-                bestWinstreak: p.bestWinstreak || 0,
-                jackpots: p.jackpots || 0
+                money: p.money ?? 1000,
+                bank: p.bank ?? 0,
+                wins: p.wins ?? 0,
+                losses: p.losses ?? 0,
+                games: p.games ?? 0,
+                winstreak: p.winstreak ?? 0,
+                bestWinstreak: p.bestWinstreak ?? 0,
+                jackpots: p.jackpots ?? 0
             };
         });
-        fs.writeFileSync("./economy.json", JSON.stringify(economy, null, 2));
+        try { fs.writeFileSync("./economy.json", JSON.stringify(economy, null, 2)); } catch(e) {}
         console.log("✅ " + players.length + " joueurs chargés depuis MongoDB");
     } catch(e) {
         console.error("Erreur sync MongoDB:", e.message);
     }
 }
-setTimeout(syncFromMongo, 3000);
+
+// Attendre que MongoDB soit connecté avant de sync (max 10 tentatives)
+async function waitAndSync() {
+    for (let i = 0; i < 10; i++) {
+        if (playersCol) {
+            await syncFromMongo();
+            return;
+        }
+        await new Promise(r => setTimeout(r, 500));
+    }
+    console.warn("⚠️ MongoDB pas dispo, economy reste vide");
+}
+waitAndSync();
 
 // ================= USER =================
 function createUser(id) {
