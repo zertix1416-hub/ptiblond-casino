@@ -255,6 +255,43 @@ app.get("/api/leaderboard", (_req, res) => {
     res.json(top);
 });
 
+// Leaderboard complet (pour la page profil — position du joueur)
+app.get("/api/leaderboard-full", (_req, res) => {
+    const eco = getEconomy();
+    const all = Object.entries(eco)
+        .map(([id, d]) => ({ id, ...d }))
+        .sort((a, b) => b.money - a.money);
+    res.json(all);
+});
+
+// Système de rangs — calcul XP et rang d'un joueur
+const RANKS = [
+    { name: "Novice",    min: 0,    color: "#888",    icon: "🃏" },
+    { name: "Apprenti",  min: 200,  color: "#4caf50", icon: "🎰" },
+    { name: "Joueur",    min: 600,  color: "#2196f3", icon: "🎲" },
+    { name: "Expert",    min: 1400, color: "#9c27b0", icon: "♠️" },
+    { name: "Vétéran",   min: 3000, color: "#ff9800", icon: "👑" },
+    { name: "Légende",   min: 6000, color: "#FFD700", icon: "🏆" },
+    { name: "PTIBLOND",  min: 12000,color: "#ff4444", icon: "💎" }
+];
+function calcXP(stats) {
+    return (stats.games || 0) * 10 + (stats.wins || 0) * 15 + (stats.jackpots || 0) * 100;
+}
+function getPlayerRank(stats) {
+    const xp = calcXP(stats);
+    let rank = RANKS[0];
+    for (const r of RANKS) if (xp >= r.min) rank = r;
+    return { ...rank, xp };
+}
+
+// API rang d'un joueur
+app.get("/api/rank/:id", (req, res) => {
+    const eco = getEconomy();
+    const p = eco[req.params.id];
+    if (!p) return res.json({ rank: RANKS[0], xp: 0 });
+    res.json(getPlayerRank(p));
+});
+
 // --- Web leaderboard (web sessions, real names) ---
 app.get("/api/web-leaderboard", (_req, res) => {
     const list = Object.values(webSessions)

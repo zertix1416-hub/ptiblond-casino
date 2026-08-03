@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Profil — PTIBLOND Casino</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--y:#FFD700;--bg:#0a0a0a;--card:#111;--b:rgba(255,255,255,.07)}
+html,body{width:100%;min-height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:#fff}
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;
+  padding:0 40px;height:60px;background:rgba(10,10,10,.97);border-bottom:1px solid var(--b)}
+#nav-logo{font-size:1.1rem;font-weight:900;color:#fff;text-decoration:none}
+#nav-logo span{color:var(--y)}
+#nav-links{display:flex;gap:6px;margin-left:28px}
+.nl{background:none;border:none;color:rgba(255,255,255,.5);font-size:.8rem;font-weight:500;
+  cursor:pointer;padding:6px 10px;border-radius:8px;transition:.2s;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.nl:hover{color:#fff;background:rgba(255,255,255,.06)}
+#nav-sp{flex:1}
+#nav-bal{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.6);
+  background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:8px;padding:6px 14px}
+#nav-bal span{color:var(--y)}
+/* PAGE */
+#page{padding:80px 40px 60px;max-width:1000px;margin:0 auto}
+/* NOT LOGGED IN */
+#not-logged{display:none;text-align:center;padding:120px 0}
+#not-logged .nl-icon{font-size:4rem;margin-bottom:20px}
+#not-logged h2{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+#not-logged p{color:rgba(255,255,255,.4);margin-bottom:28px}
+#not-logged a{display:inline-flex;align-items:center;gap:8px;background:var(--y);color:#000;
+  padding:12px 24px;border-radius:8px;font-weight:700;font-size:.9rem;text-decoration:none;transition:.2s}
+#not-logged a:hover{background:#e6c200;transform:translateY(-2px)}
+/* PROFILE HEADER */
+#prof-header{background:linear-gradient(135deg,#111 0%,#161616 100%);
+  border:1px solid var(--b);border-radius:16px;padding:36px;
+  display:flex;align-items:center;gap:32px;margin-bottom:28px;position:relative;overflow:hidden}
+#prof-header::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;
+  border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,.06),transparent 70%);pointer-events:none}
+#prof-avatar{width:88px;height:88px;border-radius:50%;border:3px solid var(--y);
+  box-shadow:0 0 24px rgba(255,215,0,.3);flex-shrink:0}
+#prof-avatar-placeholder{width:88px;height:88px;border-radius:50%;border:3px solid rgba(255,255,255,.15);
+  background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0}
+#prof-info{flex:1}
+#prof-name{font-size:1.8rem;font-weight:900;letter-spacing:.5px;margin-bottom:4px}
+#prof-discord{font-size:.8rem;color:rgba(255,255,255,.35);margin-bottom:14px}
+#rank-badge{display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:20px;font-size:.82rem;font-weight:700;letter-spacing:.5px;
+  border:1px solid currentColor;opacity:.9}
+#prof-right{text-align:right}
+#prof-balance{font-family:'Oswald',sans-serif;font-size:2.4rem;font-weight:700;color:var(--y);line-height:1}
+#prof-balance-lbl{font-size:.7rem;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+/* XP BAR */
+#xp-section{margin-top:18px}
+#xp-bar-wrap{background:rgba(255,255,255,.07);border-radius:8px;height:8px;margin-top:8px;overflow:hidden}
+#xp-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--y),#ff9800);
+  transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+#xp-info{display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.35);margin-top:5px}
+/* STATS GRID */
+#stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+@media(max-width:700px){#stats-grid{grid-template-columns:repeat(2,1fr)}}
+.sbox{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:20px;text-align:center;
+  transition:.2s}
+.sbox:hover{border-color:rgba(255,215,0,.25);transform:translateY(-2px)}
+.sbox .si{font-size:1.8rem;margin-bottom:8px}
+.sbox .sv{font-family:'Oswald',sans-serif;font-size:1.6rem;font-weight:700;color:var(--y);line-height:1}
+.sbox .sl{font-size:.65rem;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+/* SECTIONS */
+.section{margin-bottom:28px}
+.section-title{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.3);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--b)}
+/* WINRATE BAR */
+#wr-section{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:24px;margin-bottom:28px}
+.wr-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.wr-label{width:100px;font-size:.78rem;color:rgba(255,255,255,.5);flex-shrink:0}
+.wr-bar{flex:1;background:rgba(255,255,255,.06);border-radius:6px;height:10px;overflow:hidden}
+.wr-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#00c853,#69f0ae);transition:width 1s}
+.wr-fill.losses{background:linear-gradient(90deg,#e53935,#ff5252)}
+.wr-val{width:44px;text-align:right;font-size:.82rem;font-weight:700;color:var(--y)}
+/* LEADERBOARD POSITION */
+#lb-pos{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:24px;
+  display:flex;align-items:center;gap:20px}
+#lb-pos .pos-num{font-family:'Oswald',sans-serif;font-size:3rem;font-weight:700;
+  color:var(--y);line-height:1;min-width:60px;text-align:center}
+#lb-pos .pos-info{flex:1}
+#lb-pos .pos-lbl{font-size:.7rem;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+#lb-pos .pos-sub{font-size:.85rem;color:rgba(255,255,255,.5)}
+/* RANKS TABLE */
+#ranks-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+@media(max-width:700px){#ranks-grid{grid-template-columns:repeat(4,1fr)}}
+.rcard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;padding:12px 8px;text-align:center;transition:.2s}
+.rcard.active{border-color:var(--y);background:rgba(255,215,0,.06);
+  box-shadow:0 0 16px rgba(255,215,0,.1)}
+.rcard .ri{font-size:1.4rem;margin-bottom:4px}
+.rcard .rn{font-size:.65rem;font-weight:700;letter-spacing:.5px}
+.rcard .rm{font-size:.58rem;color:rgba(255,255,255,.3);margin-top:2px}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <a href="/" id="nav-logo">PTIBLOND<span>.</span></a>
+  <div id="nav-links">
+    <a href="/" class="nl">&#8592; Accueil</a>
+    <a href="blackjack.html" class="nl">&#127183; BJ</a>
+    <a href="roulette.html" class="nl">&#127921; Roulette</a>
+    <a href="slots.html" class="nl">&#127920; Slots</a>
+    <a href="giveaway.html" class="nl">&#127873; Giveaway</a>
+  </div>
+  <div id="nav-sp"></div>
+  <div id="nav-bal">Balance&nbsp;: <span id="bal-val">—</span> cr.</div>
+</nav>
+
+<div id="page">
+
+  <!-- Not logged in -->
+  <div id="not-logged">
+    <div class="nl-icon">🔒</div>
+    <h2>Connecte-toi pour voir ton profil</h2>
+    <p>Tu as besoin d'un compte Discord pour accéder à ton profil.</p>
+    <a href="/auth/discord">
+      <svg width="16" height="12" viewBox="0 0 71 55" fill="black">
+        <path d="M60.1 4.9A58.5 58.5 0 0 0 45.4.9a40 40 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.2 0A38.9 38.9 0 0 0 25.5.9 58.4 58.4 0 0 0 10.8 5C1.6 18.9-.9 32.4.3 45.7a58.9 58.9 0 0 0 18 9.1 42.4 42.4 0 0 0 3.7-6 38.3 38.3 0 0 1-5.8-2.8l1.4-1.1a42 42 0 0 0 36 0l1.4 1.1a38.4 38.4 0 0 1-5.9 2.8 42.2 42.2 0 0 0 3.7 6 58.7 58.7 0 0 0 18-9 54.1 54.1 0 0 0-9.6-40.8zM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.3 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1zm23.5 0c-3.5 0-6.4-3.2-6.4-7.1s2.8-7.2 6.4-7.2 6.5 3.3 6.4 7.2c0 3.9-2.8 7.1-6.4 7.1z"/>
+      </svg>
+      Se connecter avec Discord
+    </a>
+  </div>
+
+  <!-- Profile content (hidden until loaded) -->
+  <div id="prof-content" style="display:none">
+
+    <!-- Header -->
+    <div id="prof-header">
+      <img id="prof-avatar" src="" alt="" onerror="this.style.display='none';document.getElementById('prof-avatar-placeholder').style.display='flex'">
+      <div id="prof-avatar-placeholder" style="display:none">🎰</div>
+      <div id="prof-info">
+        <div id="prof-name">—</div>
+        <div id="prof-discord">Discord</div>
+        <div id="rank-badge">🃏 Novice</div>
+        <div id="xp-section">
+          <div id="xp-info"><span id="xp-cur">0 XP</span><span id="xp-next">—</span></div>
+          <div id="xp-bar-wrap"><div id="xp-bar-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div id="prof-right">
+        <div id="prof-balance">—</div>
+        <div id="prof-balance-lbl">Crédits</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="section-title">Statistiques</div>
+    <div id="stats-grid">
+      <div class="sbox"><div class="si">🎮</div><div class="sv" id="st-games">0</div><div class="sl">Parties</div></div>
+      <div class="sbox"><div class="si">🏆</div><div class="sv" id="st-wins">0</div><div class="sl">Victoires</div></div>
+      <div class="sbox"><div class="si">💸</div><div class="sv" id="st-losses">0</div><div class="sl">Défaites</div></div>
+      <div class="sbox"><div class="si">🎰</div><div class="sv" id="st-jackpots">0</div><div class="sl">Jackpots</div></div>
+    </div>
+
+    <!-- Winrate -->
+    <div id="wr-section">
+      <div class="section-title" style="margin-bottom:16px">Winrate</div>
+      <div class="wr-row">
+        <div class="wr-label">Victoires</div>
+        <div class="wr-bar"><div class="wr-fill" id="wr-wins" style="width:0%"></div></div>
+        <div class="wr-val" id="wr-wins-pct">0%</div>
+      </div>
+      <div class="wr-row" style="margin-bottom:0">
+        <div class="wr-label">Défaites</div>
+        <div class="wr-bar"><div class="wr-fill losses" id="wr-losses" style="width:0%"></div></div>
+        <div class="wr-val" id="wr-losses-pct">0%</div>
+      </div>
+    </div>
+
+    <!-- Classement -->
+    <div class="section-title">Position dans le classement</div>
+    <div id="lb-pos" style="margin-bottom:28px">
+      <div class="pos-num" id="lb-pos-num">#—</div>
+      <div class="pos-info">
+        <div class="pos-lbl">Classement global</div>
+        <div class="pos-sub" id="lb-pos-sub">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- Ranks -->
+    <div class="section-title">Tous les rangs</div>
+    <div id="ranks-grid"></div>
+
+  </div>
+</div>
+
+<script>
+const RANKS=[
+  {name:'Novice',    min:0,    color:'#888',    icon:'🃏', next:200},
+  {name:'Apprenti', min:200,  color:'#4caf50', icon:'🎰', next:600},
+  {name:'Joueur',   min:600,  color:'#2196f3', icon:'🎲', next:1400},
+  {name:'Expert',   min:1400, color:'#9c27b0', icon:'♠️', next:3000},
+  {name:'Vétéran',  min:3000, color:'#ff9800', icon:'👑', next:6000},
+  {name:'Légende',  min:6000, color:'#FFD700', icon:'🏆', next:12000},
+  {name:'PTIBLOND', min:12000,color:'#ff4444', icon:'💎', next:null}
+];
+
+function getRank(xp){
+  let r=RANKS[0];
+  for(const rk of RANKS) if(xp>=rk.min) r=rk;
+  return r;
+}
+function getNextRank(xp){
+  for(let i=0;i<RANKS.length;i++) if(xp<RANKS[i].min) return RANKS[i];
+  return null;
+}
+function calcXP(stats){
+  return (stats.games||0)*10 + (stats.wins||0)*15 + (stats.jackpots||0)*100;
+}
+function fmt(n){return Number(n||0).toLocaleString('fr-FR');}
+
+// Build ranks grid
+(function(){
+  const g=document.getElementById('ranks-grid');
+  RANKS.forEach(r=>{
+    const d=document.createElement('div');
+    d.className='rcard';
+    d.id='rcard-'+r.name;
+    d.innerHTML=`<div class="ri">${r.icon}</div><div class="rn" style="color:${r.color}">${r.name}</div><div class="rm">${r.min===0?'Départ':fmt(r.min)+' XP'}</div>`;
+    g.appendChild(d);
+  });
+})();
+
+var SESSION_TOKEN=localStorage.getItem('discord_session')||'';
+// Check session from URL
+(function(){
+  var p=new URLSearchParams(window.location.search);
+  var t=p.get('session');
+  if(t){SESSION_TOKEN=t;localStorage.setItem('discord_session',t);window.history.replaceState({},'','/');}
+})();
+
+async function loadProfile(){
+  if(!SESSION_TOKEN){
+    document.getElementById('not-logged').style.display='block';
+    return;
+  }
+  try{
+    const r=await fetch('/auth/me?token='+SESSION_TOKEN);
+    const u=await r.json();
+    if(u.error){document.getElementById('not-logged').style.display='block';return;}
+
+    document.getElementById('prof-content').style.display='block';
+    document.getElementById('bal-val').textContent=fmt(u.balance);
+    document.getElementById('prof-name').textContent=u.username;
+    document.getElementById('prof-discord').textContent='Discord — '+u.username;
+    document.getElementById('prof-avatar').src=u.avatar||'';
+    document.getElementById('prof-balance').textContent=fmt(u.balance);
+
+    const stats=u.stats||{};
+    const xp=calcXP(stats);
+    const rank=getRank(xp);
+    const next=getNextRank(xp);
+
+    // Rank badge
+    const badge=document.getElementById('rank-badge');
+    badge.textContent=rank.icon+' '+rank.name;
+    badge.style.color=rank.color;
+    badge.style.borderColor=rank.color;
+    badge.style.background=rank.color+'18';
+
+    // Highlight active rank card
+    document.getElementById('rcard-'+rank.name)?.classList.add('active');
+
+    // XP bar
+    document.getElementById('xp-cur').textContent=fmt(xp)+' XP';
+    if(next){
+      const pct=Math.min(100,Math.round((xp-rank.min)/(next.min-rank.min)*100));
+      document.getElementById('xp-bar-fill').style.width=pct+'%';
+      document.getElementById('xp-next').textContent='Prochain rang : '+next.name+' ('+fmt(next.min)+' XP)';
+    } else {
+      document.getElementById('xp-bar-fill').style.width='100%';
+      document.getElementById('xp-next').textContent='Rang maximum atteint 💎';
+    }
+
+    // Stats
+    document.getElementById('st-games').textContent=fmt(stats.games);
+    document.getElementById('st-wins').textContent=fmt(stats.wins);
+    document.getElementById('st-losses').textContent=fmt(stats.losses);
+    document.getElementById('st-jackpots').textContent=fmt(stats.jackpots);
+
+    // Winrate
+    const total=(stats.wins||0)+(stats.losses||0);
+    const wp=total?Math.round((stats.wins||0)/total*100):0;
+    const lp=total?Math.round((stats.losses||0)/total*100):0;
+    document.getElementById('wr-wins').style.width=wp+'%';
+    document.getElementById('wr-losses').style.width=lp+'%';
+    document.getElementById('wr-wins-pct').textContent=wp+'%';
+    document.getElementById('wr-losses-pct').textContent=lp+'%';
+
+    // Leaderboard position
+    const lb=await fetch('/api/leaderboard-full').then(r=>r.json()).catch(()=>[]);
+    const pos=lb.findIndex(p=>p.id===u.id);
+    if(pos>=0){
+      const emoji=pos===0?'🥇':pos===1?'🥈':pos===2?'🥉':'#';
+      document.getElementById('lb-pos-num').textContent=(pos===0?'🥇':pos===1?'🥈':pos===2?'🥉':'#'+(pos+1));
+      document.getElementById('lb-pos-sub').textContent='Sur '+lb.length+' joueurs — Balance : '+fmt(lb[pos].money)+' cr.';
+    } else {
+      document.getElementById('lb-pos-num').textContent='—';
+      document.getElementById('lb-pos-sub').textContent='Joue pour apparaître dans le classement !';
+    }
+
+  }catch(e){
+    document.getElementById('not-logged').style.display='block';
+  }
+}
+loadProfile();
+</script>
+</body>
+</html>

@@ -374,10 +374,112 @@ client.on("messageCreate", async message => {
     if (!cmd) return;
     createUser(message.author.id);
 
-    // PROFILE
-    if (cmd === "!profile" || cmd === "!balance") {
-        let u = economy[message.author.id];
-        return message.reply({ embeds: [premiumEmbed("👑 PROFIL VIP", `👤 Joueur ${message.author}\n💰 Fortune **${u.money} crédits**\n🏆 Victoires ${u.wins}\n💀 Défaites ${u.losses}\n🔥 Winstreak ${u.winstreak}\n👑 Record ${u.bestWinstreak}\n🎰 Parties ${u.games}`)] });
+    // ── RANK HELPERS ──
+    const RANKS_BOT = [
+        { name: "Novice",    min: 0,     icon: "🃏", color: 0x888888 },
+        { name: "Apprenti",  min: 200,   icon: "🎰", color: 0x4caf50 },
+        { name: "Joueur",    min: 600,   icon: "🎲", color: 0x2196f3 },
+        { name: "Expert",    min: 1400,  icon: "♠️", color: 0x9c27b0 },
+        { name: "Vétéran",   min: 3000,  icon: "👑", color: 0xff9800 },
+        { name: "Légende",   min: 6000,  icon: "🏆", color: 0xffd700 },
+        { name: "PTIBLOND",  min: 12000, icon: "💎", color: 0xff4444 }
+    ];
+    function calcXPBot(u){ return (u.games||0)*10 + (u.wins||0)*15 + (u.jackpots||0)*100; }
+    function getRankBot(xp){ let r=RANKS_BOT[0]; for(const rk of RANKS_BOT) if(xp>=rk.min) r=rk; return r; }
+    function getNextRankBot(xp){ for(const rk of RANKS_BOT) if(xp<rk.min) return rk; return null; }
+    function xpBar(cur, from, to, len=12){
+        if(!to) return '█'.repeat(len);
+        const pct = Math.min(1,(cur-from)/(to-from));
+        const filled = Math.round(pct*len);
+        return '█'.repeat(filled)+'░'.repeat(len-filled)+` ${Math.round(pct*100)}%`;
+    }
+
+    // PROFILE / BALANCE
+    if (cmd === "!profile" || cmd === "!profil" || cmd === "!balance") {
+        const target = message.mentions.users.first() || message.author;
+        createUser(target.id);
+        const u = economy[target.id];
+        const xp = calcXPBot(u);
+        const rank = getRankBot(xp);
+        const next = getNextRankBot(xp);
+        const wr = u.games > 0 ? Math.round(u.wins / u.games * 100) : 0;
+        const bar = xpBar(xp, rank.min, next?.min);
+
+        return message.reply({ embeds: [
+            new EmbedBuilder()
+                .setTitle(`${rank.icon} Profil de ${target.username}`)
+                .setThumbnail(target.displayAvatarURL())
+                .setColor(rank.color)
+                .addFields(
+                    { name: "💰 Balance",    value: `**${u.money.toLocaleString("fr-FR")}** crédits`, inline: true },
+                    { name: "🏦 Banque",     value: `**${(u.bank||0).toLocaleString("fr-FR")}** crédits`, inline: true },
+                    { name: "🎮 Parties",    value: `**${u.games}**`, inline: true },
+                    { name: "🏆 Victoires",  value: `**${u.wins}**`, inline: true },
+                    { name: "💀 Défaites",   value: `**${u.losses}**`, inline: true },
+                    { name: "📊 Winrate",    value: `**${wr}%**`, inline: true },
+                    { name: "🔥 Winstreak",  value: `**${u.winstreak}** (record : **${u.bestWinstreak}**)`, inline: false },
+                    { name: `${rank.icon} Rang — ${rank.name}`, value: `\`${bar}\`\n**${xp} XP**${next ? ` → ${next.name} à ${next.min} XP` : " · Rang max !"}`, inline: false }
+                )
+                .setFooter({ text: `🌐 ptiblond-casino.onrender.com · Profil complet sur le site` })
+                .setTimestamp()
+        ]});
+    }
+
+    // RANK
+    if (cmd === "!rank") {
+        const target = message.mentions.users.first() || message.author;
+        createUser(target.id);
+        const u = economy[target.id];
+        const xp = calcXPBot(u);
+        const rank = getRankBot(xp);
+        const next = getNextRankBot(xp);
+        const bar = xpBar(xp, rank.min, next?.min, 16);
+
+        // Classement global
+        const sorted = Object.entries(economy).sort((a,b)=>b[1].money-a[1].money);
+        const pos = sorted.findIndex(([id]) => id === target.id);
+        const posLabel = pos === 0 ? "🥇 1er" : pos === 1 ? "🥈 2ème" : pos === 2 ? "🥉 3ème" : `#${pos+1}`;
+
+        return message.reply({ embeds: [
+            new EmbedBuilder()
+                .setTitle(`${rank.icon} Rang de ${target.username}`)
+                .setColor(rank.color)
+                .setDescription(`**${rank.icon} ${rank.name}**\n\`${bar}\`\n\n**${xp} XP**${next ? ` · Prochain rang : **${next.name}** (${next.min} XP)` : " · **Rang maximum atteint !**"}`)
+                .addFields(
+                    { name: "📈 Classement", value: posLabel + ` sur ${sorted.length} joueurs`, inline: true },
+                    { name: "🎮 Parties",    value: `**${u.games}** jouées`, inline: true },
+                    { name: "🏆 Victoires",  value: `**${u.wins}**`, inline: true }
+                )
+                .setFooter({ text: "🌐 ptiblond-casino.onrender.com" })
+                .setTimestamp()
+        ]});
+    }
+
+    // STATS GLOBALES
+    if (cmd === "!stats") {
+        const players = Object.values(economy);
+        const totalGames = players.reduce((a,p)=>a+(p.games||0),0);
+        const totalWins  = players.reduce((a,p)=>a+(p.wins||0),0);
+        const totalJP    = players.reduce((a,p)=>a+(p.jackpots||0),0);
+        const richest    = players.reduce((a,p)=>p.money>a.money?p:a, {money:0});
+        const richEntry  = Object.entries(economy).find(([,d])=>d===richest);
+        const richUser   = richEntry ? await client.users.fetch(richEntry[0]).catch(()=>null) : null;
+
+        return message.reply({ embeds: [
+            new EmbedBuilder()
+                .setTitle("📊 Statistiques PTIBLOND Casino")
+                .setColor(0xFFD700)
+                .addFields(
+                    { name: "👥 Joueurs inscrits", value: `**${players.length}**`, inline: true },
+                    { name: "🎮 Parties jouées",   value: `**${totalGames.toLocaleString("fr-FR")}**`, inline: true },
+                    { name: "🏆 Victoires totales",value: `**${totalWins.toLocaleString("fr-FR")}**`, inline: true },
+                    { name: "💎 Jackpots",         value: `**${totalJP}**`, inline: true },
+                    { name: "💰 Plus riche",        value: richUser ? `**${richUser.username}** — ${richest.money.toLocaleString("fr-FR")} cr.` : "—", inline: true },
+                    { name: "📊 Winrate global",    value: `**${totalGames>0?Math.round(totalWins/totalGames*100):0}%**`, inline: true }
+                )
+                .setFooter({ text: "🌐 ptiblond-casino.onrender.com" })
+                .setTimestamp()
+        ]});
     }
 
     // DUEL
@@ -569,7 +671,7 @@ client.on("messageCreate", async message => {
 
     // HELP
     if (cmd === "!help") {
-        return message.reply({ embeds: [premiumEmbed("🎰 CASINO ROYALE V9", `⚔️ DUEL\n!duel @joueur mise | !accept\n\n🃏 BLACKJACK\n!bj create mise | !bj join | !bj start | !hit | !stand | !double\n\n🎰 CASINO\n!roulette mise couleur | !slots mise\n\n💼 GAINS\n!work — Travailler (cooldown 1h)\n!daily — Bonus quotidien (cooldown 24h)\n\n👑 PROFIL\n!profile | !rich\n\n🌐 SITE\n!web\n\n⚙️ ADMIN\n!addbalance | !removebalance | !setbalance`)] });
+        return message.reply({ embeds: [premiumEmbed("🎰 CASINO ROYALE — AIDE", `⚔️ **DUEL**\n\`!duel @joueur mise\` · \`!accept\` · \`!deny\`\n\n🃏 **BLACKJACK**\n\`!bj create mise\` · \`!bj join\` · \`!bj start\`\n\`!hit\` · \`!stand\` · \`!double\`\n\n🎡 **CASINO**\n\`!roulette mise rouge/noir/vert\`\n\`!slots mise\`\n\n💼 **GAINS**\n\`!work\` — Travailler (cooldown 1h)\n\`!daily\` — Bonus quotidien (cooldown 24h)\n\n👤 **PROFIL & RANGS**\n\`!profil [@joueur]\` — Voir son profil complet\n\`!rank [@joueur]\` — Voir son rang et XP\n\`!stats\` — Statistiques globales du casino\n\`!leaderboard\` / \`!lb\` — Top 10\n\n🌐 **SITE**\n\`!web\` — Lien vers le casino`)] });
     }
 
     // WEB LINK

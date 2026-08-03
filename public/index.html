@@ -104,6 +104,70 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:var(--bg);font-fam
 .sval{font-size:2rem;font-weight:900;color:var(--yellow)}
 .slbl{font-size:.72rem;color:rgba(255,255,255,.3);margin-top:4px;letter-spacing:1.5px;text-transform:uppercase}
 
+/* ── LIVE SECTION ── */
+#live-section{padding:80px 40px;border-top:1px solid rgba(255,255,255,.06);background:#0a0a0a}
+#live-section h2{font-size:1.8rem;font-weight:800;margin-bottom:8px}
+#live-section h2 span{color:var(--yellow)}
+#live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1100px;margin-top:40px}
+@media(max-width:768px){#live-grid{grid-template-columns:1fr}}
+
+/* Live Feed */
+#live-feed-box{background:#111;border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden}
+#live-feed-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;gap:8px}
+#live-feed-header .dot{width:8px;height:8px;border-radius:50%;background:#00e676;
+  box-shadow:0 0 8px #00e676;animation:blink 1.5s infinite}
+#live-feed-header span{font-size:.75rem;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.5);text-transform:uppercase}
+#live-feed-list{padding:8px 0;min-height:280px;max-height:320px;overflow-y:auto}
+#live-feed-list::-webkit-scrollbar{width:3px}
+#live-feed-list::-webkit-scrollbar-thumb{background:rgba(255,215,0,.2)}
+.lf-item{display:flex;align-items:center;gap:12px;padding:10px 20px;
+  border-bottom:1px solid rgba(255,255,255,.03);animation:lf-in .4s ease}
+@keyframes lf-in{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.lf-item:last-child{border-bottom:none}
+.lf-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:1rem;flex-shrink:0}
+.lf-icon.bj{background:rgba(255,215,0,.1)}
+.lf-icon.roulette{background:rgba(229,57,53,.1)}
+.lf-icon.slots{background:rgba(156,39,176,.1)}
+.lf-icon.win{background:rgba(0,230,118,.1)}
+.lf-icon.loss{background:rgba(229,57,53,.07)}
+.lf-body{flex:1;min-width:0}
+.lf-name{font-size:.8rem;font-weight:600;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lf-detail{font-size:.72rem;color:rgba(255,255,255,.3);margin-top:1px}
+.lf-amount{font-size:.85rem;font-weight:700;white-space:nowrap}
+.lf-amount.pos{color:#00e676}
+.lf-amount.neg{color:#e53935}
+.lf-empty{display:flex;align-items:center;justify-content:center;height:200px;
+  color:rgba(255,255,255,.2);font-size:.82rem;flex-direction:column;gap:8px}
+
+/* Leaderboard */
+#lb-box{background:#111;border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden}
+#lb-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:space-between}
+#lb-header span{font-size:.75rem;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.5);text-transform:uppercase}
+#lb-header .lb-live{font-size:.65rem;color:#00e676;letter-spacing:1px;display:flex;align-items:center;gap:5px}
+#lb-list{padding:8px 0;min-height:280px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 20px;
+  border-bottom:1px solid rgba(255,255,255,.03);transition:.2s;cursor:default}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:rgba(255,255,255,.03)}
+.lb-pos{width:28px;text-align:center;font-size:.85rem;font-weight:800;flex-shrink:0}
+.lb-pos.gold{color:#FFD700}
+.lb-pos.silver{color:#aaa}
+.lb-pos.bronze{color:#cd7f32}
+.lb-pos.other{color:rgba(255,255,255,.3)}
+.lb-name{flex:1;font-size:.82rem;font-weight:600;color:#ddd;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-rank-badge{font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:700;
+  border:1px solid currentColor;margin-right:6px;flex-shrink:0}
+.lb-money{font-size:.85rem;font-weight:700;color:var(--yellow);
+  font-variant-numeric:tabular-nums}
+
+/* ── PROFILE LINK in NAV ── */
+.nl-profile{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.18) !important;
+  color:rgba(255,215,0,.85) !important}
+
 /* ── FOOTER ── */
 #footer{padding:24px 40px;text-align:center;font-size:.72rem;
   color:rgba(255,255,255,.2);border-top:1px solid rgba(255,255,255,.06);
@@ -121,7 +185,8 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:var(--bg);font-fam
     <button class="nl"><span class="ico">&#127968;</span> Accueil</button>
     <button class="nl"><span class="ico">&#127942;</span> Bonus</button>
     <button class="nl" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})"><span class="ico">&#127918;</span> Jeux</button>
-    <button class="nl"><span class="ico">&#127381;</span> Jackpot</button>
+    <button class="nl" onclick="document.getElementById('live-section').scrollIntoView({behavior:'smooth'})"><span class="ico">&#127381;</span> Live</button>
+    <a href="profile.html" class="nl nl-profile" style="text-decoration:none"><span class="ico">👤</span> Profil</a>
     <a href="https://kick.com/ptiblond" target="_blank" class="nl" style="text-decoration:none;background:rgba(83,252,31,.08);border:1px solid rgba(83,252,31,.2);color:rgba(83,252,31,.9)"><span class="ico">&#128247;</span> Stream</a>
     <a href="giveaway.html" class="nl" style="text-decoration:none;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);color:rgba(255,215,0,.9)"><span class="ico">&#127873;</span> Giveaway</a>
   </div>
@@ -215,6 +280,41 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:var(--bg);font-fam
       </div>
       <span class="gcard-arrow">&#8599;</span>
     </a>
+
+  </div>
+</section>
+
+<!-- LIVE FEED + LEADERBOARD -->
+<section id="live-section">
+  <h2>Activité <span>en direct</span></h2>
+  <div style="color:rgba(255,255,255,.35);font-size:.88rem">Dernières parties et classement mis à jour en temps réel</div>
+
+  <div id="live-grid">
+
+    <!-- LIVE FEED -->
+    <div id="live-feed-box">
+      <div id="live-feed-header">
+        <div class="dot"></div>
+        <span>Dernières parties</span>
+      </div>
+      <div id="live-feed-list">
+        <div class="lf-empty">
+          <span style="font-size:1.5rem">🎰</span>
+          <span>Les parties apparaîtront ici en direct</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div id="lb-box">
+      <div id="lb-header">
+        <span>🏆 Classement</span>
+        <div class="lb-live"><div style="width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:blink 1.5s infinite"></div>Temps réel</div>
+      </div>
+      <div id="lb-list">
+        <div class="lf-empty"><span style="font-size:1.5rem">⏳</span><span>Chargement...</span></div>
+      </div>
+    </div>
 
   </div>
 </section>
@@ -365,6 +465,91 @@ function doLogout(){
 </script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+// ── LIVE FEED ──
+var FEED_MAX = 30;
+var feedItems = [];
+
+var GAME_ICONS = { blackjack:'🃏', roulette:'🎡', slots:'🎰', slots_jackpot:'💎', duel:'⚔️' };
+var GAME_NAMES = { blackjack:'Blackjack', roulette:'Roulette', slots:'Slots', slots_jackpot:'JACKPOT', duel:'Duel' };
+
+function fmtN(n){ return Number(n||0).toLocaleString('fr-FR'); }
+
+function renderFeed(items) {
+  var list = document.getElementById('live-feed-list');
+  if(!items.length){
+    list.innerHTML='<div class="lf-empty"><span style="font-size:1.5rem">🎰</span><span>Les parties apparaîtront ici en direct</span></div>';
+    return;
+  }
+  list.innerHTML = items.slice(0,20).map(function(e){
+    var isWin = e.win || e.type==='slots_jackpot';
+    var icon = GAME_ICONS[e.type] || '🎮';
+    var name = GAME_NAMES[e.type] || e.type;
+    var gain = e.gain || e.amount || 0;
+    var bet  = e.bet || 0;
+    var player = e.player || '?';
+    var detail = name + (bet?' · Mise '+fmtN(bet)+' cr.':'');
+    var amtHtml = gain > 0
+      ? '<div class="lf-amount pos">+'+fmtN(gain)+'</div>'
+      : (isWin===false && bet ? '<div class="lf-amount neg">-'+fmtN(bet)+'</div>' : '');
+    var iconClass = e.type==='roulette'?'roulette':e.type==='slots_jackpot'?'win':e.type==='slots'?'slots':'bj';
+    return '<div class="lf-item">'
+      +'<div class="lf-icon '+iconClass+'">'+icon+'</div>'
+      +'<div class="lf-body"><div class="lf-name">'+player+'</div><div class="lf-detail">'+detail+'</div></div>'
+      +amtHtml+'</div>';
+  }).join('');
+}
+
+// Charge le feed initial depuis l'API
+fetch('/api/live-feed').then(function(r){return r.json();}).then(function(d){
+  feedItems = d || [];
+  renderFeed(feedItems);
+}).catch(function(){});
+
+// ── LEADERBOARD ──
+var RANK_ICONS = ['🃏','🎰','🎲','♠️','👑','🏆','💎'];
+var RANK_NAMES = ['Novice','Apprenti','Joueur','Expert','Vétéran','Légende','PTIBLOND'];
+var RANK_MINS  = [0,200,600,1400,3000,6000,12000];
+var RANK_COLS  = ['#888','#4caf50','#2196f3','#9c27b0','#ff9800','#FFD700','#ff4444'];
+
+function getRankIdx(xp){
+  var idx=0;
+  for(var i=0;i<RANK_MINS.length;i++) if(xp>=RANK_MINS[i]) idx=i;
+  return idx;
+}
+function calcXP(p){ return (p.games||0)*10+(p.wins||0)*15+(p.jackpots||0)*100; }
+
+function renderLB(data) {
+  var list = document.getElementById('lb-list');
+  if(!data||!data.length){
+    list.innerHTML='<div class="lf-empty"><span>Aucun joueur</span></div>';
+    return;
+  }
+  var medals = ['🥇','🥈','🥉'];
+  list.innerHTML = data.slice(0,10).map(function(p,i){
+    var xp = calcXP(p);
+    var ri = getRankIdx(xp);
+    var posClass = i===0?'gold':i===1?'silver':i===2?'bronze':'other';
+    var posLabel = i<3 ? medals[i] : '#'+(i+1);
+    var rankLabel = RANK_ICONS[ri]+' '+RANK_NAMES[ri];
+    var name = p.username || p.name || ('Joueur #'+(i+1));
+    return '<div class="lb-row">'
+      +'<div class="lb-pos '+posClass+'">'+posLabel+'</div>'
+      +'<div class="lb-rank-badge" style="color:'+RANK_COLS[ri]+';border-color:'+RANK_COLS[ri]+'22">'+rankLabel+'</div>'
+      +'<div class="lb-name">'+name+'</div>'
+      +'<div class="lb-money">'+fmtN(p.money)+' cr.</div>'
+      +'</div>';
+  }).join('');
+}
+
+function loadLB(){
+  fetch('/api/leaderboard-full').then(function(r){return r.json();}).then(function(d){
+    renderLB(d);
+  }).catch(function(){});
+}
+loadLB();
+setInterval(loadLB, 15000); // refresh toutes les 15s
+
+// ── SOCKET.IO ──
 (function(){
   var s;try{s=io();}catch(e){return;}
   s.on('connect',function(){
@@ -377,6 +562,16 @@ function doLogout(){
       var pl=JSON.parse(localStorage.getItem('casino_player')||'{"balance":1000}');
       pl.balance=d.newBalance;localStorage.setItem('casino_player',JSON.stringify(pl));updateBal();
     }
+  });
+  // Live events → feed
+  s.on('live_event',function(e){
+    feedItems.unshift(e);
+    if(feedItems.length>FEED_MAX) feedItems.pop();
+    renderFeed(feedItems);
+  });
+  // Economy update → refresh LB
+  s.on('economy_update',function(){
+    setTimeout(loadLB, 500);
   });
 })();
 </script>
